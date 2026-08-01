@@ -1,7 +1,34 @@
 ---
 title: "Chapter 2"
+author: "Max Arthur Hachemeister"
 format: html
+ipynb-shell-interactivity: all
+toc: true
 ---
+
+# Prerequisites
+
+[Link to chapter](https://wesmckinney.com/book/python-basics)
+
+
+::: {.callout-note}
+
+I set the YAML variable `ipynb-shell-interacivity` to `all` at some point to have the output of all the calls instead of only the last one.
+So some mentiones here are about that, when I didn't yet know of that option.
+
+However, I still wonder how Wes did it for his Book rendering.
+
+:::
+
+
+# 2.2 Ipython Basics
+
+I just tested the codes here, but nothing fancy so far. Ah yeah, and I'm also not running the jupyter notebook, but work from a quarto notebook from within positron, to get going on that tool aswell
+
+```{python}
+b = 355 + 256
+```
+
 ```{python}
 import numpy as np
 
@@ -9,13 +36,633 @@ data = [np.random.standard_normal() for i in range(7)]
 data
 ```
 
-
 ```{python}
 def func_with_keywords(abra=1, abbra=2, abbbra=3):
     return abra, abbra, abbbra
 ```
 
-
 ```{python}
 b = [1, 2, 3]
+
+b
 ```
+
+# 2.3 Python Language Basics
+
+Python uses "significant" whitespace. Which means that the indentation of lines matters for the execution of the code. In `R` for example, whitespace is arbitrary and for human viewing only.
+
+Colons "`:`" denote an indented code block, and semicolons "`;`" separate code chunks in the same line.
+
+Everything in Python is an object, even functions.
+
+The pound mark "`#`" denotes a comment, which is a part of the script that will not be evaluated.
+
+Functions are called with parentheses "`()`", in which also the arguments can be set. The returned value of that function call can directly be assinged to a new variable with `=`.
+
+Most Python objects also have further functions that are referred to as *methods*. These can be accessed by appending a period "`.`" to the object, e.g.: `object.some_method`.
+
+### Variables and Argument Passing
+
+When assigning a variable to something in Python the variable is only a reference to the object. In Python, this means that assigning several variables to the same object does not copy it, but rather creates two references to the same object. For example:
+
+```{python}
+# Assing a to a list of three numbers.
+a = [1, 2, 3]
+
+# Assign b to a
+b = a
+
+# Show both
+a
+b
+```
+
+Ah interesting, so I told Python to evaluate `b` and `a` separately by separating them with `;`, and I gave me one result. Well, in the next step I will append to `a` and then evaluate `b`, which then should give the appended list, as both variables refer to one single object. Let's see:
+
+```{python}
+a.append(4)
+
+b
+```
+
+::: {.callout-note}
+Assign is also referred to as *bind*
+:::
+
+I don't know what the next paragraph is supposed to imply.
+I think something like, that objects assigned in functions are "placeholders" in some sense, meaning that they can be replaced with the "name"/variable of another assigned object.
+So if I have the function:
+
+```{python}
+def append_element(some_list, element):
+    some_list.append(element)
+```
+
+If I were to replace `some_list` with another variable pointing to a valid object, say `a`, then Python knows that the `some_list.append` should now read as `a.append`.
+Otherwise the function would only accept variables/objects that are literally named `some_list`.
+Let's see I that works:
+
+```{python}
+# Append 5 here, because above we already `append`ed 4 to `a`
+# and that function actually changes the object.
+append_element(a, 5)
+
+a
+```
+
+### Dynamic References, Strong Types
+
+So variables can change dynamically, i.e., the can easyli reference different objects in throughout the same session. But object types are strict and not *cast*(converted implicitly), meaning changing an integer `5` to the string `"5"` to match another string variable. Python will throw an error instead.
+
+Ah, but *floats* and *integers* are *cast*.
+
+Strings and integers don't match:
+```{python}
+#| error: true
+
+a = "5"
+b = 5
+
+a + b
+```
+
+But integers and floats will work.
+
+And here we also show that variables can change what they refer to
+mid notebook:
+```{python}
+
+a = 5.5
+b = 5
+
+a + b
+```
+
+Use `isinstance` to check object types:
+
+```{python}
+a = 5
+
+isinstance(a, int)
+```
+
+Or even check for several possible types:
+
+```{python}
+a = 5; b = 4.5
+
+isinstance(a, (int, float))
+
+isinstance(b, (int, float))
+```
+
+### Attributes and Methods
+
+Objects can have both *attributes* and *methods* (functions that directly access the object data) assigned to them, wich all are accessible with appending a period to the object like: `object.attribute/funcion`.
+
+### Duck Typing
+
+Instead of checking the type you can also just check whether a certain behaviour is possible for an object; this is referred to as *duck typing*, in the sense of "if it walks like a duck and quacks like a duck, it is a duck".
+
+For example, most strings and Python collection types are *iterable*:
+
+```{python}
+#| error: true
+
+def isiterable(obj):
+    try:
+        iter(obj)
+        return True
+    except TypeError: # not iterable
+        return False
+
+isiterable("a string")
+
+isiterable([1, 2, 3])
+
+isiterable(5)
+```
+
+### Imports
+
+*Modules* are any files with a *.py* extension containing Python code.
+Their code can be accessed and used with the `import` function.
+
+So I've written a the file *some_module.py* with the following code:
+
+```{python}
+# some_module.py
+PI = 3.141359
+
+
+def f(x):
+    return x + 2
+
+
+def g(a, b):
+    return a + b
+```
+
+I can `import` the whole module, meaning all its functions are accessible in this session (they are in *scope*):
+
+```{python}
+import some_module
+
+result = some_module.f(5)
+pi = some_module.PI
+
+result
+pi
+```
+
+Or we can use `from` to `import` specific parts of the module:
+
+```{python}
+from some_module import g, PI
+
+result = g(5, PI)
+result
+```
+
+Also, with the `as` keyword the imports can be assinged individual variables:
+
+```{python}
+import some_module as sm
+from some_module import PI as pi, g as gf
+
+# Here we call the *method* "f" of sm.
+r1 = sm.f(pi)
+
+# And here we call both `gf` and `pi` which we assigned before.
+r2 = gf(6, pi)
+
+print(r1, r2)
+```
+
+
+Okay, one major difference between Python and R is that Python only gives the last evaluation as result, whereas R prints the result of each expression. So in R `r1 r2` would print both values, but the equivalent in Python goes:
+
+```{python}
+r1
+r2
+```
+
+
+
+### Binary Operators and Comparisons
+
+::: {.callout-warning}
+
+Table 2.1: Binary Operators
+
+`a < b,` a <= b
+
+has mixed formatting. I think both parts should be as code like:
+
+`a < b, a <= b`
+
+:::
+
+
+Good, there are many of the binary math operations that I know from R.
+
+Some notable differences:
+
+Operation | Description | R Equivalent
+- | --- | --
+`a // b` |  Floor-divide (modulo) `a` by `b` | `a %/% b`
+`a ** b` | Raise `a` to the power of `b` | `a ^ b`
+`a ^ b` | For Booleans, `True` if `a` or `b` is `True`, but not for both; for integers, take the bitwise `EXCLUSIVE-OR` | *I don't know.*
+
+And I don't know what the "bitwise `AND`" or "bitwise `OR`" should mean.
+
+Interesting, `list` creates a new object from its inputs instead of just pointing them. And in that regard `==` checks whether the *values* of the arguments are the same, whereas `is` checks whether the same object is pointed to.
+
+
+```{python}
+a = [1, 2, 3]
+b = a
+c = list(a)
+```
+
+```{python}
+a is b
+```
+
+```{python}
+a == c
+```
+```{python}
+a is c
+```
+
+### Mutable and Immutable Objects
+
+Now I see that Python uses zero-based indexing, while R has one-based indexing.
+
+The internal structure of Python objects can be "mutated" directly, without having to create an new objects with the iterated values. This is however discouraged, or should be explicitly stated when implemening in a function.
+
+### Scalar Types
+
+These are the built-in types of Python.
+
+`None` would be the `NULL` equivalent of R. But R additionaly has the `NA`-type.
+
+#### Numeric Types
+
+`int` and `float`
+
+We can also use scientific notation for those:
+
+```{python}
+a = 6000
+b = 6e3
+print(a, b)
+```
+
+Ah, but the `6e3` becomes a `float`, sure!
+
+#### Strings
+
+Strings are written with either `"` or `'`, and −− nice feature −− triple qoutes make multiline strings, so you can spare the `\n`.
+
+```{python}
+a = "Lasagna,\nYeah!\n"
+b = """
+Lasagna,
+Yeah!
+"""
+
+print(a, b)
+```
+
+Strings are immutable. So you have to replace the whole object with an iteration of it.
+You can't change only the "i" in "string": 
+```{python}
+#| error: true
+
+a = "string"
+a[4] = "o"
+```
+
+You need the "replace"-method for that:
+```{python}
+a = a.replace("i", "o")
+a
+```
+
+`str()` converts other object types to strings.
+
+Strings are technically just a `list` of unicode characters:
+
+```{python}
+s = "python"
+
+print(
+    list(s),"\n",
+    s[:3]
+    )
+```
+
+And then there is the usual escaping with "\" to literally print characters that have a function otherwise.
+
+```{python}
+#| error: true
+
+print("12 \ 34")
+```
+
+
+```{python}
+print("12 \\ 34")
+```
+
+Prepend "r" (standing for 'raw') to a string so all characters are used literally.
+
+```{python}
+print(r"12 \ 34")
+```
+
+A `+` adds strings together (concatenate)
+
+```{python}
+# Don't forget the space as a separator
+a = "This is the first part "
+b = "and this is the second."
+
+a + b
+```
+
+String templating is pre-defining format types for certain parts of a string, so that they print as expected.
+
+```{python}
+template = "{0:s}, this Lasagna gets {1:.2f} out of {2:d} shoeboxes!"
+
+#Call the "format" method 
+template.format("Yo", 19.11348, 17)
+```
+
+Ah, but the new Python *f-strings* feature is much more convenient, as the objects can be referred to directly in the "{}" (embraces).
+
+
+```{python}
+opener = "Yo"
+points = 19.11348
+baseline = 17
+result = f"{opener}, this Lasagna gets {points / 2} out of {baseline / 2} shoeboxes!"
+
+print(result)
+```
+
+#### Bytes and Unicode
+
+
+::: {.callout-warning}
+
+I see that the headline formatting is inconsistent.
+Sometimes title case sometimes sentence case.
+
+:::
+
+Since Python 3.0 characters can be enconded and transcoded according to Unicode standards. *utf-8* is encuraged as the standard.
+
+Use the "encode" method to transcode strings in the wild to your liking.
+
+#### Booleans
+
+Booleans in Python are the values `True` and `False`.
+
+They can be combined with `and` and `or`.
+
+Converted to numbers they become `1` and `0` respectively.
+
+`not` invertes the interpretation, so that `True` becomes `False` and vice versa.
+
+#### Type Casting
+
+Here, we have this *casting* of types. That I can input a `3` into `bool()` and it will cast it into `True`.
+This works also with the types `str`, `bool`, `int`, `str`, and `float`.
+
+#### None
+
+That's a null value type, like the `NULL` in R.
+
+It's a common default value in functions.
+
+#### Dates and Times
+
+The `datetime` module is a built-in of Python to handle the types `datetime`, `date`, and `time`.
+
+`datetimes` have the following default format: `datetime(YYYY, mm, dd, HH, MM, SS)`, and can be accessed with their natural language equivalents.
+
+This package has to be imported first:
+```{python}
+# We select single functions from the package here
+from datetime import datetime, date, time
+
+dt = datetime(2026, 7, 29, 11, 43, 46)
+
+print(dt.day, dt.year, dt.second)
+```
+
+We can split a `datetime` object into its main parts `date` and `time` with the corresponding methods.
+
+```{python}
+print(dt.date(), dt.time())
+```
+
+We can get "strings from time" with the `strftime` method with the according wildcards.
+
+```{python}
+dt.strftime("%Y-%m-%d %H:%M %S\'\'")
+```
+
+And from "string parse time" with the `strptime` method:
+
+```{python}
+datetime.strptime("20260729114346", "%Y%m%d%H%M%S")
+```
+
+`datetimes` are immutable, so we need a method to chance parts of their content, which then will result in a new object.
+
+`timedelta` does both get the difference between `datetimes` and produce shifted ones.
+
+```{python}
+#| error: true
+
+delta = datetime.timedelta(days= 17, seconds=128)
+```
+
+But I can't define a timedelta initially? Let's see:
+
+```{python}
+delta = datetime(2026, 7, 30, 12, 6, 10)
+
+offset = dt - delta
+offset
+
+dt + offset
+```
+
+### Control Flow
+
+#### if, elif and else
+
+The `if` statement checks a condition, and if that is `True` evaluates the code block that follows.
+
+```{python}
+x = -5
+if x < 0:
+    print("It's negative.")
+```
+
+To iterate further, `if` statements can be followed by `elif` (else if), to check for another condition with the `else` statement as the result when all other checks turned out `false`.
+
+```{python}
+x = 0
+
+if x < 0:
+    print("It's negative.")
+elif x == 0:
+    print("Equal to zero")
+elif 0 < x < 5:
+    print("Between zero and five")
+else:
+    print("Positive and five or larger")
+```
+
+Compound conditions – those with `and` and `or` - are evaluated from left to right. For example, if the first statement of an `or` check is `True` then the other conditions are not checked and the following code block is evaluated directly.
+
+#### for loops
+
+`for` loops iterate over collection of values (vector in R) like lists or tuples.
+Here is how to read a `for` expression:
+
+```{python}
+#| eval: false
+
+for each_value in collection:
+    do_x 
+```
+
+Take each value of that collection and do the task with that value in mind.
+For example, sum up all the values with the `+=` statement:
+
+```{python}
+collection = [1, 2, 3, 4, 5, 6]
+total = 0
+
+for each_value in collection:
+    # if value is None:
+    #     continue
+    total += each_value
+print(total)
+```
+
+Note that the name for `each_object` can be arbitrarly defined and is just there as a *pointer* to be referenced in the functions body.
+So the following expression works the same:
+
+```{python}
+for i in collection:
+    total += i
+print(total)    
+```
+
+You can tell a loop to `continue` in cases that your actual function might fail.
+For example, the `+=` can only handle integers and will fail when there is an empty `None` value, which often is the case with data in the wild:
+
+```{python}
+#| error: true
+
+collection = [1, 2, None, 3, None, 5]
+
+for i in collection:
+    total += i
+print(total)
+```
+
+So here you can tell your loop: if you find a `None` just `continue`:
+
+```{python}
+for i in collection:
+    if i is None:
+        continue
+    total += i
+print(total)
+```
+
+`break` is used to end the loop at a given condition.
+So if we wanted to sum all the values till a zero comes up:
+
+```{python}
+collection = [1, 2, 3, 7, 0, 6, 9, 1]
+total_till_0 = 0
+
+for i in collection:
+    if i == 0:
+        break
+    total_till_0 += i
+print(total_till_0)
+```
+
+Loops can be *nested* by defining multiple pointers. This is just something to have in mind for now, but here is an example of that:
+
+What we want here is: "For each number from 1 to 4 (i), print each number from 1 to 4 (j) next to it until it is larger than the first (i)."
+```{python}
+for i in range(4):     # for each number of 1 to 4 (i)
+    for j in range(4):    
+        if j > i:         # until j is larger than i
+            break         # where you stop and go to the next i 
+        print((i, j))  # print each number from 1 to 4 (j) next to it.
+```
+
+#### while loops
+
+::: {.callout-note}
+
+I can't currently make sense of the expression given.
+I don't yet understand the `while` loop, but will continue in the book.
+
+:::
+
+```{python}
+x = 256
+total = 0
+
+while x > 0:
+    if total > 500:
+        break
+    total += x
+    x = x // 2
+
+x
+```
+
+#### pass
+
+`pass` is a "do nothing" statement, and mosly used as a placeholder for an actual function to be implemented later.
+
+#### range
+
+`range` generates a evenly spaced vector of integers, so you don't have to write them all out yourself.
+Sounds simple, but there a lot functionality, but of first note is that `ragne` itself just gives you an object, meaning it does not generate an output for you to read, but to be used with other functions:
+```{python}
+range(10)
+```
+
+With `list` you could show the content of the object:
+
+```{python}
+list(range(10))
+```
+
+Ah here we see the 0 index again. So I would expect all the values from 1 to 10, but it just gives 10 values starting from 0, so we end at 9
+
+You can define other step sizes than 1, but then you have to also define start and stop:
+
+```{python}
+list(range(0, 10, 2))
+``` 
+
+Ah, and the "stop" value is not included. So I would expect the numbers 0, 2, 4, 6, 8, 10,; but we stop at 8.
+
