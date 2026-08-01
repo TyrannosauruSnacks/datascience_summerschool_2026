@@ -670,3 +670,133 @@ I'm getting a little bit of traction I guess...
 
 # 3.2 Functions
 
+Spare repetitive code writing by making it a function.
+
+`def` starts the declaration of a function, after which the function name and its arguments are defined, and then after a `:` the *function body* - the thing it's supposed to do - follows. Like so:
+
+```{python}
+def function_name(argument_a, argument_b):
+    return argument_a + argument_b
+```
+
+`return` is important, as only then the actual results of the computations are put out. The default behaviour otherwise is `None` as output (silent success).
+
+This function `return`s the result:
+```{python}
+def my_function(a, b):
+    return a + b
+
+result = my_function(1, 2)
+result
+```
+
+This one does not:
+```{python}
+def my_function_silent(a, b,):
+    a + b
+
+result = my_function_silent("I ", "succeeded")
+print(result)
+```
+
+Arguments can have default values assinged with `=` to them and then are referred to as *keyword arguments*, while the ones without default values are called *positional*.
+
+```{python}
+def my_function2(
+    x,  # This is positional
+    y,  # This as well
+    z=1.5,  # And this is a keyword argument
+):
+    if z > 1:  # If z is larger than 1 (the implicit default)
+        return z * (x + y)  # Multiply it with the sum of x and y
+    else:  # If not
+        return z / (x + y)  # Divide it by the sum of x and y
+```
+
+Some remarks about the order in which to call positional and keyword arguments.
+
+## Namespaces, Scope, and Local Functions
+
+So there is a distinction between arguments and variables in functions.
+Just because you defined an argument does not make it a variable. This is sometimes confusing for me, when reading functions and wondering why and where an `a` might have come from, when the arguments were just `x, y, z`, or so.
+Well, at least with the typst language that confused me.
+
+But keep in mind that variables created in functions are destroyed at the end unless you say to `return` them.
+Also the other way around, a function might use a variable outside of its scope, but only if it already exists.
+
+Here, we create the variable as part of the function:
+```{python}
+def func():
+    a = []
+    for i in range(5):
+        a.append(i)
+```
+
+But get nothing out of it because its an interal variable and there is no `return`:
+
+```{python}
+result = func()
+print(result)
+```
+
+If we write the function to just append to *any* variable named `a`:
+
+```{python}
+def func():
+    # We leave out the internal variable `a`
+    for i in range(5):
+        a.append(i)
+```
+
+It will fail, if `a` does not already exist:
+
+```{python}
+#| error: true
+
+func()
+```
+
+There are two ways to go about that.
+Either assign the variable in golbal scope beforehand:
+```{python}
+a = []
+func()
+a
+```
+
+Or explictily tell the function to assging its internal variable in `global` scope:
+```{python}
+def func():
+    global b
+    b = []
+    for i in range(5):
+        b.append(i)
+
+func()
+b
+```
+
+## Returning Multiple Values
+
+You can return multiple values and assign them directly to separate variables by separating the variables with `,` on the left side of the assignment. This is slick if you think about it for ar moment:
+
+```{python}
+# Define the function to `return` a, b, and c individually.
+def f():
+    a = 5
+    b = 6
+    c = 7
+    return a, b, c
+
+
+# Assign three different variables to the output of the function.
+x, y, z = f()
+
+# Show the results.
+x
+y
+z
+```
+
+## Functions are Objects
+
