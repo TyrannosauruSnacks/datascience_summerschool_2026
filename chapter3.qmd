@@ -1,0 +1,672 @@
+---
+title: "chapter 3 - Built-In Data Structures, Functions, and Files"
+subtiltle: ""
+author: "Max Arthur Hachemeister"
+format: html
+ipynb-shell-interactivity: all
+toc: true
+date: last-modified
+---
+
+# Prerequisites
+
+[Link to Chapter](https://wesmckinney.com/book/python-builtin)
+
+# 3.1 Data Structures and Sequences
+
+## Tuple
+
+A tuple is somewhat of an *safer* object, as it's *immutable*, meaning it cannot be changed but only new versions can be copied from it. They can be assinged with or without their values in parentheses:
+
+```{python}
+tup = (4, 5, 6)
+tup
+
+tup = 4, 5, 6
+tup
+```
+
+Any sequence or iterable object can be converted accordingly with `tuple`:
+
+```{python}
+tuple(range(11))
+
+tuple("Lasagna")
+```
+
+Elements of a tuple (but also other sequeces) can be accessed with `[]`.
+Remember the zero-index, though:
+
+```{python}
+tup = 1, 2, 3
+tup[0]
+
+sequence = range(11)
+sequence[0]
+```
+
+Tuples can be nested (so they are like lists in R?):
+
+
+::: {.callout-note}
+
+This takes some getting used to.
+It's like a pack of candy which holds smaller bags of candy which then hold the individual candies
+
+:::
+
+This is a bag, containing two smaller bags that contain the individual value:
+```{python}
+bag = (4, 5, 6), (7, 8)
+bag
+```
+
+So in a first step, I would only open the bag and hold the smaller bag in my hand:
+```{python}
+smaller_bag = bag[0]
+smaller_bag
+```
+
+And from that bag I can get a single candy:
+```{python}
+candy = smaller_bag[0]
+candy
+```
+
+So now it get's mushy. 
+While a tuple itself is immutable, the objects it stores still can be.
+So you cannot change the arrangement of the objects in a tuple but the contents of individual objects you can.
+
+Create a tuple with a string, a list, and a boolean:
+```{python}
+tup = ("Lasagna", [1, 2], True)
+```
+
+Try to assing something new to tuple slot 2:
+
+```{python}
+#| error: true
+
+tup[1] = "something_new"
+```
+
+Mutate the object of slot 2 of the tuple itself:
+
+```{python}
+tup[1].append(3)
+tup
+```
+
+Tuples can be merged (concatenated) together with `+`:
+
+```{python}
+("Lasagna", [1, 2, 3], True) + ("even more", 15) + (None, )
+```
+
+And multiplying a tuple merges (concatenates) several copies of it:
+
+```{python}
+("Lasagna", 1, True) * 3
+```
+
+### Unpacking Tuples
+
+I can *unpack* the elements of a tuple by giving tuple-like assingment on the left side of `=` (the assing operator).
+
+```{python}
+tup = (4, 5, 6)
+
+a, c, b = tup
+
+a; b; c
+```
+
+But it then needs variables for all the tuple elements:
+
+```{python}
+#| error: true
+
+a, b = tup
+```
+
+Also, nested tuples can be unpacked:
+
+```{python}
+tup = 4, 5, (6, 7)
+
+a, b, c = tup
+c
+```
+
+Even down into the nesting:
+
+```{python}
+a, b, (c, d) = tup
+
+c; d
+```
+
+This works generally variables, and you can make multiple *unpacks* (or reassigns) like so:
+
+```{python}
+a, b = 1, 2
+
+a
+b
+```
+
+```{python}
+b, a = a, b
+
+a
+b
+```
+
+With a `*something` (usually `*_`) you can designate the "rest" of a tuple to aviod assinging all elements when you just want some of those:
+
+```{python}
+tup = 1, 2, 3, 4, 5
+
+a, b, *_ = tup
+
+a
+b
+_
+```
+
+#### Tuple Methods
+
+Tuples - as many Python objects - have methods attached to then accessible with `tuple.method()`.
+`.count()` being useful for counting occurences of a given value:
+
+```{python}
+tup = 1, 2, 1, 1, 3, 4, 5, 1, 1
+
+tup.count(1)
+```
+
+## List
+
+Lists are mutable, so their elements can be mutated without having to copy an iteration of the object. But lists can be derived from tuples with `list()`:
+
+```{python}
+list_1 = [2, 3, 7, None]
+
+tup = ("foo", "bar", "baz")
+
+list_2 = list(tup)
+
+list_2[0] = "Lasagna"
+
+list_1[3] = "Lasagna"
+
+list_1
+list_2
+```
+
+Lists and tuples can be, and are, used interchangeably in many code.
+
+As shown in Chapter 2, `list` is also a nice way to *view* the result of generator objects:
+
+```{python}
+gen = range(11)
+
+gen
+
+list(gen)
+```
+
+### Adding and Removing Elements
+
+Okay, the following methods all change the object in place. Now this term makes sense to me.
+The object is altered permanently. (In R you would have to explicitely assign to a new object.)
+
+`append` adds an element to the end of the list:
+
+```{python}
+list_2
+
+list_2.append("Dosagna")
+
+list_2
+```
+
+`insert` creates a new spot between elements of a list an places a new one there:
+
+```{python}
+list_2.insert(1, "Resagna")
+
+list_2
+```
+
+`pop` is the inverse of `insert`, as it removes an element and its space in the list and also returns it:
+
+```{python}
+list_2.pop(2)
+
+list_2
+```
+
+`remove` works like `pop` but takes a value instead of index:
+
+```{python}
+list_2.remove("baz")
+
+list_2
+```
+
+The `in` and `not in` operators check for the occurence or non-occurence of a value in lists:
+
+```{python}
+"Dosagna" in list_2
+
+"Lasagna" not in list_2
+```
+
+### Concatenating and Combining Lists
+
+Lists - just as tuples - can be concatenated with the `+` operator:
+
+```{python}
+[4, None, "foo"] + [7, 8, (2, 3)]
+```
+
+```{python}
+part_1 = [4, None, "foo"]
+part_2 = [7, 8, (2, 3)]
+
+part_1 + part_2
+```
+
+Lists also have the `extend` method, which results also merges new elements to a list, but in this case to an already existing one. This safes some computations as an possibly already large list must not be copied to a new merged object, as would be the case with the `+` operator concatenation
+
+This copies both lists and concatenates them into a new object, even with the same variable assinged:
+```{python}
+part_1 = part_1 + part_2
+part_1
+```
+
+This adds to an already existing object:
+
+```{python}
+part_1 = [4, None, "foo"]
+
+part_1.extend(part_2)
+part_1
+```
+
+### Sorting
+
+The `sort` method mutates the list object in place (changes it permanently):
+
+```{python}
+a = [7, 2, 5, 1, 3]
+a.sort()
+a
+```
+
+There are some practical options, most notably, the `key` option, with which a function can be defined by which to transform each value before comparing them. So you could sort strings by length instead of alphabetically as follows:
+
+```{python}
+b = ["otherwise","this", "how", "what", "Lasagna"]
+
+b.sort(key = len)
+b
+```
+
+### Slicing
+
+Parts of sequences can be direcly selected with putting a `:` (colon) into the `[]` indexing operator:
+
+```{python}
+seq = [3, 7, 5, 8, 0, 6, 7, 5]
+
+seq[1:5]
+```
+
+Ah yeah, zero-index again, and also the stop index is not included in the output.
+So whole parts of lists can be mutated with the slicing operator like:
+
+```{python}
+seq[0:3] = [1, 2, 3]
+
+seq
+```
+
+When `start` or `stop` are omitted, "from the beginning of the sequence" or "till the end of the sequence" is implied:
+
+```{python}
+# From the first element till (exclusive) index 4.
+seq[:4]
+
+# From index 2 till (inclusive) the last element.
+seq[2:]
+```
+
+Negative indices are counted from the last element backward, but the slicing is still evalutated from `start` to (exclusive) `stop`:
+
+```{python}
+seq[-4:-2]
+```
+
+If I want every i-th element there is the `::` (double colon) as a `step` operator:
+
+```{python}
+# Every 2nd element
+seq[::2]
+```
+
+And reversing the order of the elements can be done with a negative step argument:
+
+```{python}
+seq[::-1]
+```
+
+## Dictionary
+Most important built-in Python data structure (I don't recall handling these structures in R, but I know it from NIX).
+A dict is described with `{}` (embrace). Its elements are *key-value* pairs denoted by a `:` and separated with `,`.
+
+```{python}
+empty_dict = {}
+d1 = {"a": "some value", "b": [1, 2, 3, 4]}
+
+d1
+```
+
+Now, just as with `list`, I can access, set, or insert elements either by index or - in this case - the "value" of the *key*:
+
+```{python}
+# Add an Elemend with the key 7 and the value "an integer".
+d1[7] = "an integer"
+d1
+
+# Access the elememt with the "b" key.
+d1["b"]
+```
+
+I can also check the dictionary for occurence of keys (but probably not values) with the `in` operator:
+
+```{python}
+7 in d1
+"some value" in d1
+```
+
+For deletion there are mainly two ways; either with the `del` operator or with the `pop` method, where the former succeeds silently and the latter returns the deleted element:
+
+```{python}
+# Add an element with 5 as the key and "some value" as value.
+d1[5] = "some value"
+d1
+
+# Add an element with "dummy" as the key and "another value" as value.
+d1["dummy"] = "another value"
+d1
+
+# Delete the element with 5 as the key.
+del d1[5]
+d1
+
+# Pop the element with "dummy" as the key and assing the output to the variable `ret`.
+ret = d1.pop("dummy")
+ret
+d1
+```
+
+Keys and values can be separately accessed for iteration with the `keys` and `values` method respectively:
+
+```{python}
+# Put all the keys in a list
+list(d1.keys())
+
+# Put all the values in a list
+list(d1.values())
+```
+
+Additionaly, the `items` method puts all the elements of a dictionary into a list with nested tuples:
+
+```{python}
+d1
+list(d1.items())
+```
+
+Dictionaries can be merged with the `update` method:
+
+```{python}
+# Merge the dictionary {"b" : "foo", "c": 12} with d1
+d1.update({"b": "foo", "c": 12})
+
+d1
+```
+
+Beware though that, as `update` implies, if you merge an element that matches an existing key, the old element gets mutated in place, which is what happened with the `b` element in our case.
+
+### Creating Dictionaries from Sequences
+
+With the `dict` function any list of *2-tuples* can become a dictionary, sparing you writing a for-loop:
+
+```{python}
+# zip makes tuples from the input iterables
+tuples = zip("abcde", range(5))
+tuples
+
+# Get a dictionary from the zip (tuples) element
+mapping = dict(tuples)
+mapping
+```
+
+### Default Values
+
+Okay, this is a tough part. There are for-loops and then methods as more succint versions of those loops. Which means that these expressions are used often. So I should make an effort to understant what is happening. But it's tough.
+
+This expression says: "If the key exists give me its value otherwise give me a default value (that I pre-defined)":
+
+```{}
+if key in some_dict:
+    value = some_dict[key]
+else:
+    value = default_value
+```
+
+And the `get` or `pop` method basically does the same:
+
+```{}
+value = some_dict.get(key, default_value)
+```
+
+The *default* default value of `get` is `None`, but `pop` will "raise an exception" (whatever that means).
+
+Next, we have a for loop to categorize words by their firs letters. Let's see what I can make out of this:
+
+```{python}
+# Create a list with words
+words = ["apple", "bat", "bar", "basagna", "atom", "book"]
+
+# Create an empty dictionary
+by_letter = {}
+
+# Make the for-loop
+## For each element in words
+for word in words:
+    ## get the first letter and assign it to "letter"
+    letter = word[0]
+    ## Check if the letter is amongst the keys in "by_letter"
+    ## If not, then the default is the key "letter" and its value an empty list
+    ## and .append then means add the word to that list
+    by_letter.setdefault(letter, []).append(word)
+
+by_letter
+```
+
+Okay, what kinda got me was the stacked method `by_letter.setdefault().append()`. I didn't know that would be possible, so had a hard time even noticing that. But loop logic in general is not really intuitive...
+
+And there is another function from a package that does this even more conveniently:
+
+```{python}
+# import the function defaultdict from the package collections
+from collections import defaultdict
+
+by_letter = defaultdict(list)
+by_letter
+
+by_letter["lasagna"[0]].append("lasagna")
+by_letter
+```
+
+So it seems to be an important function to automatically order elements to existing keys and to create keys if there are new key values coming in. I guess for the grouping and sorting stuff.
+
+### Valid Dictionary Key Types
+
+Keys for dictionaries can only be Python objects that are *hashable*. Python will throw you an error if that's not the case.
+
+Lists are not hashable, but you can convert them to a tuple, if you really wanted them as a key.
+
+## Set
+
+*Sets* seem to be like vectors in R. You can create them with either the `set` function, or with `{}` (embrace):
+
+```{python}
+set([2, 2, 3, 7, 3, 7, 7, 9])
+
+{2, 2, 3, 7, 3, 7, 7, 9}
+```
+
+Ah no, so a set only keeps the unique (distinct) values of its input.
+
+Then there are some operators to handle sets. The `union` method, or `|` operator, gives all the distinct values from the total of both sets, and the `intersection` method, or `&` operator, gives only those distinct values that both lists share. Like the `or` and `and` syntax for other object types.
+
+And there are many more operations for sets. Check the Help, or Chapter 3 Table 3.1 of the book.
+
+So here it's again about efficient computation. For sets there are methods that replace the set on the *left side* instead of having to create a whole new object. Keep that in mind when working with big datasets. Basically ending other operators with `=`
+
+
+```{python}
+a = set(range(5))
+a
+b = {3, 4, 5, 6, 7, 8}
+
+# Make c an independent copy of the a object
+c = a.copy()
+
+# Mutate c to the total distinct values of the sets b and c 
+c |= b
+c
+
+# Make d an independent copy of the a object
+d = a.copy()
+
+# Mutate d to the distinct values that the sets d and b share
+d &= b
+d
+```
+
+## Built-In Sequence Functions
+
+These are all nice to know, and used whenever possible.
+
+### enumerate
+
+Nice to keep track of the index of items in a sequence. So nice that it has its own function for for-loop implementation. So you can prepend this in a for-loop so that the index is being tracked for whatever the rest of the loop does.
+
+```{}
+for index, value in enumerate(collection):
+```
+
+### sorted
+
+`sorted` takes any sequence and returns the elements in a sorted list.
+
+```{python}
+sorted("lasagna, man!")
+
+sorted([2, 9, 4, 7, 4, 6, 6, 0, 1])
+```
+
+### zip
+
+`zip` merges any number of lists into a list of tuples. It has some special heuristic about when to stop, if there are lists with different number of elements:
+
+
+```{python}
+seq1 = ["swag", "lasagna", "foo"]
+seq2 = ["one", "two", "three", "four"]
+seq3 = [1, 2, 3, 4, 5, 6, 7]
+
+zipped = zip(seq1, seq2, seq3)
+
+list(zipped)
+```
+
+And this is an example to bring in `enumerate`:
+
+```{python}
+for i, (a, b, c) in enumerate(zip(seq1, seq2, seq3)):
+    print(f"{i}: {a}  \t{b}\t{c}")
+```
+
+### Reversed
+
+`reversed` reverses the order of sequences:
+
+```{python}
+list(reversed(range(10)))
+```
+
+## List, Set, and Dictionary Comprehensions
+
+Now it get's fancy!
+Python seems to have a lot of sytax implemented to avoid having to spell out the for-loop sytax every time.
+
+For example, there is a syntax that applies a function to each element of a sequence:
+
+```{python}
+#|eval: false
+[expression for value in collection if condition]
+```
+
+So we could apply the method `upper` to all elements in a list of strings that have more than two letters like so:
+
+```{python}
+# Create the list of strings
+strings = ["a", "as", "Lasagna", "Caramel", "breath", "you"]
+
+# According to the syntax above it goes
+[x.upper() for x in strings if len(x) > 2]
+```
+
+Ah, but the only the applicable strings are returned, so we filter out the short ones.
+Probably a way to concatenate, or append them back together...
+
+The same sytax goes for sets and dictionaries, just with `{}` for the `[]`.
+
+An alternative to this is the `map` function with the syntax `map(function(), sequence_object)`.
+If we wanted to get the length for each string we could go:
+
+```{python}
+list(map(len, strings))
+```
+
+And something again with `enumerate`...
+
+### Nested List Comprehensions
+
+Hmm, so for nested lists its quite a brain exercise because the sytax makes it possible, but it's hard to keep track what part refers to which level.
+
+Let's see. I make a list of tuples first:
+
+```{python}
+tuple_list = [(1, 2, 3), (4, 5, 6), (7, 8, 9)]
+```
+
+Now, let's refer to the tuples as tup, and each element of the tuple as num. Then the expression for just having all the nums in a list would be:
+
+```{python}
+num_list = [num for tup in tuple_list for num in tup]
+num_list
+```
+
+This reads a bit backwards. So for each tup in tuple_list and each num within a tup return the num.
+
+I'm getting a little bit of traction I guess...
+
+# 3.2 Functions
+

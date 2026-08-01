@@ -1,0 +1,7 @@
+hello_world.py
+pyproject.toml
+pydata_book.egg-info/PKG-INFO
+pydata_book.egg-info/SOURCES.txt
+pydata_book.egg-info/dependency_links.txt
+pydata_book.egg-info/requires.txt
+pydata_book.egg-info/top_level.txt

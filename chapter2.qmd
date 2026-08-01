@@ -1,0 +1,21 @@
+---
+title: "Chapter 2"
+format: html
+---
+```{python}
+import numpy as np
+
+data = [np.random.standard_normal() for i in range(7)]
+data
+```
+
+
+```{python}
+def func_with_keywords(abra=1, abbra=2, abbbra=3):
+    return abra, abbra, abbbra
+```
+
+
+```{python}
+b = [1, 2, 3]
+```
