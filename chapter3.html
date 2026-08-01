@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Max Arthur Hachemeister">
-<meta name="dcterms.date" content="2026-07-31">
+<meta name="dcterms.date" content="2026-08-01">
 
-<title>chapter 3 - Built-In Data Structures, Functions, and Files</title>
+<title>Chapter 3</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -112,8 +112,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#zip" id="toc-zip" class="nav-link" data-scroll-target="#zip">zip</a></li>
   <li><a href="#reversed" id="toc-reversed" class="nav-link" data-scroll-target="#reversed">Reversed</a></li>
   </ul></li>
-  <li><a href="#list-set-and-dictionary-comprehensions" id="toc-list-set-and-dictionary-comprehensions" class="nav-link" data-scroll-target="#list-set-and-dictionary-comprehensions">List, Set, and Dictionary Comprehensions</a></li>
+  <li><a href="#list-set-and-dictionary-comprehensions" id="toc-list-set-and-dictionary-comprehensions" class="nav-link" data-scroll-target="#list-set-and-dictionary-comprehensions">List, Set, and Dictionary Comprehensions</a>
+  <ul class="collapse">
+  <li><a href="#nested-list-comprehensions" id="toc-nested-list-comprehensions" class="nav-link" data-scroll-target="#nested-list-comprehensions">Nested List Comprehensions</a></li>
   </ul></li>
+  </ul></li>
+  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">3.2 Functions</a></li>
   </ul>
 </nav>
 </div>
@@ -121,7 +125,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">chapter 3 - Built-In Data Structures, Functions, and Files</h1>
+<h1 class="title">Chapter 3</h1>
+<p class="subtitle lead">Built-In Data Structures, Functions, and Files</p>
 </div>
 
 
@@ -138,7 +143,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">July 31, 2026</p>
+      <p class="date">August 1, 2026</p>
     </div>
   </div>
   
@@ -159,7 +164,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="tuple" class="level2">
 <h2 class="anchored" data-anchor-id="tuple">Tuple</h2>
 <p>A tuple is somewhat of an <em>safer</em> object, as it’s <em>immutable</em>, meaning it cannot be changed but only new versions can be copied from it. They can be assinged with or without their values in parentheses:</p>
-<div id="9a3e04a8" class="cell" data-execution_count="1">
+<div id="091ecb03" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>tup <span class="op">=</span> (<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>tup</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -173,7 +178,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Any sequence or iterable object can be converted accordingly with <code>tuple</code>:</p>
-<div id="8931df80" class="cell" data-execution_count="2">
+<div id="35774920" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">tuple</span>(<span class="bu">range</span>(<span class="dv">11</span>))</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">tuple</span>(<span class="st">"Lasagna"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -185,7 +190,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Elements of a tuple (but also other sequeces) can be accessed with <code>[]</code>. Remember the zero-index, though:</p>
-<div id="7ede062a" class="cell" data-execution_count="3">
+<div id="bfdf648d" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>tup <span class="op">=</span> <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>tup[<span class="dv">0</span>]</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -213,7 +218,7 @@ Note
 </div>
 </div>
 <p>This is a bag, containing two smaller bags that contain the individual value:</p>
-<div id="240afd3a" class="cell" data-execution_count="4">
+<div id="c545e86d" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>bag <span class="op">=</span> (<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>), (<span class="dv">7</span>, <span class="dv">8</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>bag</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
@@ -221,7 +226,7 @@ Note
 </div>
 </div>
 <p>So in a first step, I would only open the bag and hold the smaller bag in my hand:</p>
-<div id="e566c9d4" class="cell" data-execution_count="5">
+<div id="143c9800" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>smaller_bag <span class="op">=</span> bag[<span class="dv">0</span>]</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>smaller_bag</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
@@ -229,7 +234,7 @@ Note
 </div>
 </div>
 <p>And from that bag I can get a single candy:</p>
-<div id="78ff6b50" class="cell" data-execution_count="6">
+<div id="1469873f" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>candy <span class="op">=</span> smaller_bag[<span class="dv">0</span>]</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>candy</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
@@ -238,11 +243,11 @@ Note
 </div>
 <p>So now it get’s mushy. While a tuple itself is immutable, the objects it stores still can be. So you cannot change the arrangement of the objects in a tuple but the contents of individual objects you can.</p>
 <p>Create a tuple with a string, a list, and a boolean:</p>
-<div id="652ebec6" class="cell" data-execution_count="7">
+<div id="2227a787" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>tup <span class="op">=</span> (<span class="st">"Lasagna"</span>, [<span class="dv">1</span>, <span class="dv">2</span>], <span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Try to assing something new to tuple slot 2:</p>
-<div id="04410874" class="cell" data-execution_count="8">
+<div id="99e2c447" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>tup[<span class="dv">1</span>] <span class="op">=</span> <span class="st">"something_new"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-error">
 <div class="ansi-escaped-output">
@@ -256,7 +261,7 @@ Note
 </div>
 </div>
 <p>Mutate the object of slot 2 of the tuple itself:</p>
-<div id="8c655c40" class="cell" data-execution_count="9">
+<div id="24b317b4" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>tup[<span class="dv">1</span>].append(<span class="dv">3</span>)</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>tup</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
@@ -264,14 +269,14 @@ Note
 </div>
 </div>
 <p>Tuples can be merged (concatenated) together with <code>+</code>:</p>
-<div id="830c559a" class="cell" data-execution_count="10">
+<div id="2196123f" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>(<span class="st">"Lasagna"</span>, [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>], <span class="va">True</span>) <span class="op">+</span> (<span class="st">"even more"</span>, <span class="dv">15</span>) <span class="op">+</span> (<span class="va">None</span>, )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <pre><code>('Lasagna', [1, 2, 3], True, 'even more', 15, None)</code></pre>
 </div>
 </div>
 <p>And multiplying a tuple merges (concatenates) several copies of it:</p>
-<div id="1b8aa415" class="cell" data-execution_count="11">
+<div id="fbf2d886" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>(<span class="st">"Lasagna"</span>, <span class="dv">1</span>, <span class="va">True</span>) <span class="op">*</span> <span class="dv">3</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="11">
 <pre><code>('Lasagna', 1, True, 'Lasagna', 1, True, 'Lasagna', 1, True)</code></pre>
@@ -280,7 +285,7 @@ Note
 <section id="unpacking-tuples" class="level3">
 <h3 class="anchored" data-anchor-id="unpacking-tuples">Unpacking Tuples</h3>
 <p>I can <em>unpack</em> the elements of a tuple by giving tuple-like assingment on the left side of <code>=</code> (the assing operator).</p>
-<div id="21f95ab0" class="cell" data-execution_count="12">
+<div id="132fb307" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>tup <span class="op">=</span> (<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>)</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>a, c, b <span class="op">=</span> tup</span>
@@ -297,7 +302,7 @@ Note
 </div>
 </div>
 <p>But it then needs variables for all the tuple elements:</p>
-<div id="082868be" class="cell" data-execution_count="13">
+<div id="84dea749" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>a, b <span class="op">=</span> tup</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-error">
 <div class="ansi-escaped-output">
@@ -306,12 +311,12 @@ Note
 <span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[13]</span><span class="ansi-green-fg">, line 1</span>
 <span class="ansi-green-fg">----&gt; </span><span class="ansi-green-fg">1</span> a, b = tup
 
-<span class="ansi-red-fg">ValueError</span>: too many values to unpack (expected 2)</pre>
+<span class="ansi-red-fg">ValueError</span>: too many values to unpack (expected 2, got 3)</pre>
 </div>
 </div>
 </div>
 <p>Also, nested tuples can be unpacked:</p>
-<div id="0414ecdf" class="cell" data-execution_count="14">
+<div id="e11393cf" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>tup <span class="op">=</span> <span class="dv">4</span>, <span class="dv">5</span>, (<span class="dv">6</span>, <span class="dv">7</span>)</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>a, b, c <span class="op">=</span> tup</span>
@@ -321,7 +326,7 @@ Note
 </div>
 </div>
 <p>Even down into the nesting:</p>
-<div id="09a174ba" class="cell" data-execution_count="15">
+<div id="c29d3c85" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>a, b, (c, d) <span class="op">=</span> tup</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>c<span class="op">;</span> d</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -333,7 +338,7 @@ Note
 </div>
 </div>
 <p>This works generally variables, and you can make multiple <em>unpacks</em> (or reassigns) like so:</p>
-<div id="369225bf" class="cell" data-execution_count="16">
+<div id="f9351007" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>a, b <span class="op">=</span> <span class="dv">1</span>, <span class="dv">2</span></span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>a</span>
@@ -345,7 +350,7 @@ Note
 <pre><code>2</code></pre>
 </div>
 </div>
-<div id="a4245516" class="cell" data-execution_count="17">
+<div id="5ada1a6e" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>b, a <span class="op">=</span> a, b</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>a</span>
@@ -358,7 +363,7 @@ Note
 </div>
 </div>
 <p>With a <code>*something</code> (usually <code>*_</code>) you can designate the “rest” of a tuple to aviod assinging all elements when you just want some of those:</p>
-<div id="938c9d43" class="cell" data-execution_count="18">
+<div id="cb89c1a7" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>tup <span class="op">=</span> <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span></span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>a, b, <span class="op">*</span>_ <span class="op">=</span> tup</span>
@@ -379,7 +384,7 @@ Note
 <section id="tuple-methods" class="level4">
 <h4 class="anchored" data-anchor-id="tuple-methods">Tuple Methods</h4>
 <p>Tuples - as many Python objects - have methods attached to then accessible with <code>tuple.method()</code>. <code>.count()</code> being useful for counting occurences of a given value:</p>
-<div id="cec73ff3" class="cell" data-execution_count="19">
+<div id="1531410f" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>tup <span class="op">=</span> <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">1</span>, <span class="dv">1</span></span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>tup.count(<span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -393,7 +398,7 @@ Note
 <section id="list" class="level2">
 <h2 class="anchored" data-anchor-id="list">List</h2>
 <p>Lists are mutable, so their elements can be mutated without having to copy an iteration of the object. But lists can be derived from tuples with <code>list()</code>:</p>
-<div id="280fa1f5" class="cell" data-execution_count="20">
+<div id="9d9f549a" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>list_1 <span class="op">=</span> [<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">7</span>, <span class="va">None</span>]</span>
 <span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>tup <span class="op">=</span> (<span class="st">"foo"</span>, <span class="st">"bar"</span>, <span class="st">"baz"</span>)</span>
@@ -415,7 +420,7 @@ Note
 </div>
 <p>Lists and tuples can be, and are, used interchangeably in many code.</p>
 <p>As shown in Chapter 2, <code>list</code> is also a nice way to <em>view</em> the result of generator objects:</p>
-<div id="d07241ee" class="cell" data-execution_count="21">
+<div id="cd77cea7" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>gen <span class="op">=</span> <span class="bu">range</span>(<span class="dv">11</span>)</span>
 <span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>gen</span>
@@ -432,7 +437,7 @@ Note
 <h3 class="anchored" data-anchor-id="adding-and-removing-elements">Adding and Removing Elements</h3>
 <p>Okay, the following methods all change the object in place. Now this term makes sense to me. The object is altered permanently. (In R you would have to explicitely assign to a new object.)</p>
 <p><code>append</code> adds an element to the end of the list:</p>
-<div id="8a85c2f9" class="cell" data-execution_count="22">
+<div id="14928c98" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>list_2</span>
 <span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>list_2.append(<span class="st">"Dosagna"</span>)</span>
@@ -446,7 +451,7 @@ Note
 </div>
 </div>
 <p><code>insert</code> creates a new spot between elements of a list an places a new one there:</p>
-<div id="9ace17bb" class="cell" data-execution_count="23">
+<div id="810d278e" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>list_2.insert(<span class="dv">1</span>, <span class="st">"Resagna"</span>)</span>
 <span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>list_2</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -455,7 +460,7 @@ Note
 </div>
 </div>
 <p><code>pop</code> is the inverse of <code>insert</code>, as it removes an element and its space in the list and also returns it:</p>
-<div id="5ff23f4d" class="cell" data-execution_count="24">
+<div id="bdcc7455" class="cell" data-execution_count="24">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>list_2.pop(<span class="dv">2</span>)</span>
 <span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>list_2</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -467,7 +472,7 @@ Note
 </div>
 </div>
 <p><code>remove</code> works like <code>pop</code> but takes a value instead of index:</p>
-<div id="803a96a1" class="cell" data-execution_count="25">
+<div id="879bc8e0" class="cell" data-execution_count="25">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>list_2.remove(<span class="st">"baz"</span>)</span>
 <span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>list_2</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -476,7 +481,7 @@ Note
 </div>
 </div>
 <p>The <code>in</code> and <code>not in</code> operators check for the occurence or non-occurence of a value in lists:</p>
-<div id="9cb5c3d9" class="cell" data-execution_count="26">
+<div id="1c767217" class="cell" data-execution_count="26">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="co">"Dosagna"</span> <span class="kw">in</span> list_2</span>
 <span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a><span class="co">"Lasagna"</span> <span class="kw">not</span> <span class="kw">in</span> list_2</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -491,13 +496,13 @@ Note
 <section id="concatenating-and-combining-lists" class="level3">
 <h3 class="anchored" data-anchor-id="concatenating-and-combining-lists">Concatenating and Combining Lists</h3>
 <p>Lists - just as tuples - can be concatenated with the <code>+</code> operator:</p>
-<div id="c8b98a05" class="cell" data-execution_count="27">
+<div id="d6c9e4f8" class="cell" data-execution_count="27">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb65"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>[<span class="dv">4</span>, <span class="va">None</span>, <span class="st">"foo"</span>] <span class="op">+</span> [<span class="dv">7</span>, <span class="dv">8</span>, (<span class="dv">2</span>, <span class="dv">3</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="27">
 <pre><code>[4, None, 'foo', 7, 8, (2, 3)]</code></pre>
 </div>
 </div>
-<div id="2f3a5fe0" class="cell" data-execution_count="28">
+<div id="39ef0e44" class="cell" data-execution_count="28">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb67"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>part_1 <span class="op">=</span> [<span class="dv">4</span>, <span class="va">None</span>, <span class="st">"foo"</span>]</span>
 <span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>part_2 <span class="op">=</span> [<span class="dv">7</span>, <span class="dv">8</span>, (<span class="dv">2</span>, <span class="dv">3</span>)]</span>
 <span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -508,7 +513,7 @@ Note
 </div>
 <p>Lists also have the <code>extend</code> method, which results also merges new elements to a list, but in this case to an already existing one. This safes some computations as an possibly already large list must not be copied to a new merged object, as would be the case with the <code>+</code> operator concatenation</p>
 <p>This copies both lists and concatenates them into a new object, even with the same variable assinged:</p>
-<div id="94deb3ea" class="cell" data-execution_count="29">
+<div id="b8299f55" class="cell" data-execution_count="29">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb69"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>part_1 <span class="op">=</span> part_1 <span class="op">+</span> part_2</span>
 <span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>part_1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="29">
@@ -516,7 +521,7 @@ Note
 </div>
 </div>
 <p>This adds to an already existing object:</p>
-<div id="fbcf8af1" class="cell" data-execution_count="30">
+<div id="bb71836b" class="cell" data-execution_count="30">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb71"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>part_1 <span class="op">=</span> [<span class="dv">4</span>, <span class="va">None</span>, <span class="st">"foo"</span>]</span>
 <span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>part_1.extend(part_2)</span>
@@ -529,7 +534,7 @@ Note
 <section id="sorting" class="level3">
 <h3 class="anchored" data-anchor-id="sorting">Sorting</h3>
 <p>The <code>sort</code> method mutates the list object in place (changes it permanently):</p>
-<div id="0371985c" class="cell" data-execution_count="31">
+<div id="9ddc1d82" class="cell" data-execution_count="31">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb73"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> [<span class="dv">7</span>, <span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">1</span>, <span class="dv">3</span>]</span>
 <span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>a.sort()</span>
 <span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a>a</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -538,7 +543,7 @@ Note
 </div>
 </div>
 <p>There are some practical options, most notably, the <code>key</code> option, with which a function can be defined by which to transform each value before comparing them. So you could sort strings by length instead of alphabetically as follows:</p>
-<div id="092da550" class="cell" data-execution_count="32">
+<div id="8512cc3b" class="cell" data-execution_count="32">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb75"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> [<span class="st">"otherwise"</span>,<span class="st">"this"</span>, <span class="st">"how"</span>, <span class="st">"what"</span>, <span class="st">"Lasagna"</span>]</span>
 <span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>b.sort(key <span class="op">=</span> <span class="bu">len</span>)</span>
@@ -551,7 +556,7 @@ Note
 <section id="slicing" class="level3">
 <h3 class="anchored" data-anchor-id="slicing">Slicing</h3>
 <p>Parts of sequences can be direcly selected with putting a <code>:</code> (colon) into the <code>[]</code> indexing operator:</p>
-<div id="c66bac28" class="cell" data-execution_count="33">
+<div id="0b55955f" class="cell" data-execution_count="33">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb77"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>seq <span class="op">=</span> [<span class="dv">3</span>, <span class="dv">7</span>, <span class="dv">5</span>, <span class="dv">8</span>, <span class="dv">0</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">5</span>]</span>
 <span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a>seq[<span class="dv">1</span>:<span class="dv">5</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -560,7 +565,7 @@ Note
 </div>
 </div>
 <p>Ah yeah, zero-index again, and also the stop index is not included in the output. So whole parts of lists can be mutated with the slicing operator like:</p>
-<div id="a052ccc9" class="cell" data-execution_count="34">
+<div id="f9bad3f8" class="cell" data-execution_count="34">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb79"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>seq[<span class="dv">0</span>:<span class="dv">3</span>] <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]</span>
 <span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>seq</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -569,7 +574,7 @@ Note
 </div>
 </div>
 <p>When <code>start</code> or <code>stop</code> are omitted, “from the beginning of the sequence” or “till the end of the sequence” is implied:</p>
-<div id="80b29c5d" class="cell" data-execution_count="35">
+<div id="4b2c0c1b" class="cell" data-execution_count="35">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb81"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="co"># From the first element till (exclusive) index 4.</span></span>
 <span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>seq[:<span class="dv">4</span>]</span>
 <span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -583,14 +588,14 @@ Note
 </div>
 </div>
 <p>Negative indices are counted from the last element backward, but the slicing is still evalutated from <code>start</code> to (exclusive) <code>stop</code>:</p>
-<div id="0742112e" class="cell" data-execution_count="36">
+<div id="556ce4d8" class="cell" data-execution_count="36">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb84"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>seq[<span class="op">-</span><span class="dv">4</span>:<span class="op">-</span><span class="dv">2</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="36">
 <pre><code>[0, 6]</code></pre>
 </div>
 </div>
 <p>If I want every i-th element there is the <code>::</code> (double colon) as a <code>step</code> operator:</p>
-<div id="25d3ee6b" class="cell" data-execution_count="37">
+<div id="c2139554" class="cell" data-execution_count="37">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb86"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Every 2nd element</span></span>
 <span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a>seq[::<span class="dv">2</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="37">
@@ -598,7 +603,7 @@ Note
 </div>
 </div>
 <p>And reversing the order of the elements can be done with a negative step argument:</p>
-<div id="f6f5748f" class="cell" data-execution_count="38">
+<div id="6bbaf177" class="cell" data-execution_count="38">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb88"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>seq[::<span class="op">-</span><span class="dv">1</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="38">
 <pre><code>[5, 7, 6, 0, 8, 3, 2, 1]</code></pre>
@@ -609,7 +614,7 @@ Note
 <section id="dictionary" class="level2">
 <h2 class="anchored" data-anchor-id="dictionary">Dictionary</h2>
 <p>Most important built-in Python data structure (I don’t recall handling these structures in R, but I know it from NIX). A dict is described with <code>{}</code> (embrace). Its elements are <em>key-value</em> pairs denoted by a <code>:</code> and separated with <code>,</code>.</p>
-<div id="571a073d" class="cell" data-execution_count="39">
+<div id="1ff6c587" class="cell" data-execution_count="39">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb90"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>empty_dict <span class="op">=</span> {}</span>
 <span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a>d1 <span class="op">=</span> {<span class="st">"a"</span>: <span class="st">"some value"</span>, <span class="st">"b"</span>: [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>]}</span>
 <span id="cb90-3"><a href="#cb90-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -619,7 +624,7 @@ Note
 </div>
 </div>
 <p>Now, just as with <code>list</code>, I can access, set, or insert elements either by index or - in this case - the “value” of the <em>key</em>:</p>
-<div id="25adf88b" class="cell" data-execution_count="40">
+<div id="9cb4fc54" class="cell" data-execution_count="40">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb92"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add an Elemend with the key 7 and the value "an integer".</span></span>
 <span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>d1[<span class="dv">7</span>] <span class="op">=</span> <span class="st">"an integer"</span></span>
 <span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a>d1</span>
@@ -634,7 +639,7 @@ Note
 </div>
 </div>
 <p>I can also check the dictionary for occurence of keys (but probably not values) with the <code>in</code> operator:</p>
-<div id="197b5506" class="cell" data-execution_count="41">
+<div id="0ea744e0" class="cell" data-execution_count="41">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb95"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span> <span class="kw">in</span> d1</span>
 <span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a><span class="co">"some value"</span> <span class="kw">in</span> d1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="41">
@@ -645,7 +650,7 @@ Note
 </div>
 </div>
 <p>For deletion there are mainly two ways; either with the <code>del</code> operator or with the <code>pop</code> method, where the former succeeds silently and the latter returns the deleted element:</p>
-<div id="7d2e879f" class="cell" data-execution_count="42">
+<div id="ac3c5912" class="cell" data-execution_count="42">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb98"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add an element with 5 as the key and "some value" as value.</span></span>
 <span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>d1[<span class="dv">5</span>] <span class="op">=</span> <span class="st">"some value"</span></span>
 <span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>d1</span>
@@ -686,7 +691,7 @@ Note
 </div>
 </div>
 <p>Keys and values can be separately accessed for iteration with the <code>keys</code> and <code>values</code> method respectively:</p>
-<div id="6cedba23" class="cell" data-execution_count="43">
+<div id="253666fe" class="cell" data-execution_count="43">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb104"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Put all the keys in a list</span></span>
 <span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a><span class="bu">list</span>(d1.keys())</span>
 <span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -700,7 +705,7 @@ Note
 </div>
 </div>
 <p>Additionaly, the <code>items</code> method puts all the elements of a dictionary into a list with nested tuples:</p>
-<div id="8ce61503" class="cell" data-execution_count="44">
+<div id="193eab19" class="cell" data-execution_count="44">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb107"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>d1</span>
 <span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a><span class="bu">list</span>(d1.items())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="44">
@@ -711,7 +716,7 @@ Note
 </div>
 </div>
 <p>Dictionaries can be merged with the <code>update</code> method:</p>
-<div id="604bb094" class="cell" data-execution_count="45">
+<div id="40ea4087" class="cell" data-execution_count="45">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb110"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge the dictionary {"b" : "foo", "c": 12} with d1</span></span>
 <span id="cb110-2"><a href="#cb110-2" aria-hidden="true" tabindex="-1"></a>d1.update({<span class="st">"b"</span>: <span class="st">"foo"</span>, <span class="st">"c"</span>: <span class="dv">12</span>})</span>
 <span id="cb110-3"><a href="#cb110-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -724,7 +729,7 @@ Note
 <section id="creating-dictionaries-from-sequences" class="level3">
 <h3 class="anchored" data-anchor-id="creating-dictionaries-from-sequences">Creating Dictionaries from Sequences</h3>
 <p>With the <code>dict</code> function any list of <em>2-tuples</em> can become a dictionary, sparing you writing a for-loop:</p>
-<div id="c03e952c" class="cell" data-execution_count="46">
+<div id="c157fa3b" class="cell" data-execution_count="46">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb112"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a><span class="co"># zip makes tuples from the input iterables</span></span>
 <span id="cb112-2"><a href="#cb112-2" aria-hidden="true" tabindex="-1"></a>tuples <span class="op">=</span> <span class="bu">zip</span>(<span class="st">"abcde"</span>, <span class="bu">range</span>(<span class="dv">5</span>))</span>
 <span id="cb112-3"><a href="#cb112-3" aria-hidden="true" tabindex="-1"></a>tuples</span>
@@ -733,7 +738,7 @@ Note
 <span id="cb112-6"><a href="#cb112-6" aria-hidden="true" tabindex="-1"></a>mapping <span class="op">=</span> <span class="bu">dict</span>(tuples)</span>
 <span id="cb112-7"><a href="#cb112-7" aria-hidden="true" tabindex="-1"></a>mapping</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="46">
-<pre><code>&lt;zip at 0x7f4e9a30d080&gt;</code></pre>
+<pre><code>&lt;zip at 0x7f69bec80dc0&gt;</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="46">
 <pre><code>{'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4}</code></pre>
@@ -752,7 +757,7 @@ else:
 <pre><code>value = some_dict.get(key, default_value)</code></pre>
 <p>The <em>default</em> default value of <code>get</code> is <code>None</code>, but <code>pop</code> will “raise an exception” (whatever that means).</p>
 <p>Next, we have a for loop to categorize words by their firs letters. Let’s see what I can make out of this:</p>
-<div id="cffb0afc" class="cell" data-execution_count="47">
+<div id="4e64b7c4" class="cell" data-execution_count="47">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb117"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a list with words</span></span>
 <span id="cb117-2"><a href="#cb117-2" aria-hidden="true" tabindex="-1"></a>words <span class="op">=</span> [<span class="st">"apple"</span>, <span class="st">"bat"</span>, <span class="st">"bar"</span>, <span class="st">"basagna"</span>, <span class="st">"atom"</span>, <span class="st">"book"</span>]</span>
 <span id="cb117-3"><a href="#cb117-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -776,7 +781,7 @@ else:
 </div>
 <p>Okay, what kinda got me was the stacked method <code>by_letter.setdefault().append()</code>. I didn’t know that would be possible, so had a hard time even noticing that. But loop logic in general is not really intuitive…</p>
 <p>And there is another function from a package that does this even more conveniently:</p>
-<div id="9b227000" class="cell" data-execution_count="48">
+<div id="e4897895" class="cell" data-execution_count="48">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb119"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a><span class="co"># import the function defaultdict from the package collections</span></span>
 <span id="cb119-2"><a href="#cb119-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> defaultdict</span>
 <span id="cb119-3"><a href="#cb119-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -803,7 +808,7 @@ else:
 <section id="set" class="level2">
 <h2 class="anchored" data-anchor-id="set">Set</h2>
 <p><em>Sets</em> seem to be like vectors in R. You can create them with either the <code>set</code> function, or with <code>{}</code> (embrace):</p>
-<div id="8db56c90" class="cell" data-execution_count="49">
+<div id="48f1626c" class="cell" data-execution_count="49">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb122"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span>([<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">7</span>, <span class="dv">3</span>, <span class="dv">7</span>, <span class="dv">7</span>, <span class="dv">9</span>])</span>
 <span id="cb122-2"><a href="#cb122-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb122-3"><a href="#cb122-3" aria-hidden="true" tabindex="-1"></a>{<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">7</span>, <span class="dv">3</span>, <span class="dv">7</span>, <span class="dv">7</span>, <span class="dv">9</span>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -818,7 +823,7 @@ else:
 <p>Then there are some operators to handle sets. The <code>union</code> method, or <code>|</code> operator, gives all the distinct values from the total of both sets, and the <code>intersection</code> method, or <code>&amp;</code> operator, gives only those distinct values that both lists share. Like the <code>or</code> and <code>and</code> syntax for other object types.</p>
 <p>And there are many more operations for sets. Check the Help, or Chapter 3 Table 3.1 of the book.</p>
 <p>So here it’s again about efficient computation. For sets there are methods that replace the set on the <em>left side</em> instead of having to create a whole new object. Keep that in mind when working with big datasets. Basically ending other operators with <code>=</code></p>
-<div id="b2449085" class="cell" data-execution_count="50">
+<div id="0cdd349b" class="cell" data-execution_count="50">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb125"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb125-1"><a href="#cb125-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="bu">set</span>(<span class="bu">range</span>(<span class="dv">5</span>))</span>
 <span id="cb125-2"><a href="#cb125-2" aria-hidden="true" tabindex="-1"></a>a</span>
 <span id="cb125-3"><a href="#cb125-3" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> {<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>}</span>
@@ -858,7 +863,7 @@ else:
 <section id="sorted" class="level3">
 <h3 class="anchored" data-anchor-id="sorted">sorted</h3>
 <p><code>sorted</code> takes any sequence and returns the elements in a sorted list.</p>
-<div id="689b285c" class="cell" data-execution_count="51">
+<div id="65a145ab" class="cell" data-execution_count="51">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb130"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true" tabindex="-1"></a><span class="bu">sorted</span>(<span class="st">"lasagna, man!"</span>)</span>
 <span id="cb130-2"><a href="#cb130-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb130-3"><a href="#cb130-3" aria-hidden="true" tabindex="-1"></a><span class="bu">sorted</span>([<span class="dv">2</span>, <span class="dv">9</span>, <span class="dv">4</span>, <span class="dv">7</span>, <span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">6</span>, <span class="dv">0</span>, <span class="dv">1</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -873,7 +878,7 @@ else:
 <section id="zip" class="level3">
 <h3 class="anchored" data-anchor-id="zip">zip</h3>
 <p><code>zip</code> merges any number of lists into a list of tuples. It has some special heuristic about when to stop, if there are lists with different number of elements:</p>
-<div id="4c776b5b" class="cell" data-execution_count="52">
+<div id="c89c8dd9" class="cell" data-execution_count="52">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb133"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb133-1"><a href="#cb133-1" aria-hidden="true" tabindex="-1"></a>seq1 <span class="op">=</span> [<span class="st">"swag"</span>, <span class="st">"lasagna"</span>, <span class="st">"foo"</span>]</span>
 <span id="cb133-2"><a href="#cb133-2" aria-hidden="true" tabindex="-1"></a>seq2 <span class="op">=</span> [<span class="st">"one"</span>, <span class="st">"two"</span>, <span class="st">"three"</span>, <span class="st">"four"</span>]</span>
 <span id="cb133-3"><a href="#cb133-3" aria-hidden="true" tabindex="-1"></a>seq3 <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>]</span>
@@ -886,7 +891,7 @@ else:
 </div>
 </div>
 <p>And this is an example to bring in <code>enumerate</code>:</p>
-<div id="1ad15379" class="cell" data-execution_count="53">
+<div id="97ecb624" class="cell" data-execution_count="53">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb135"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb135-1"><a href="#cb135-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, (a, b, c) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(seq1, seq2, seq3)):</span>
 <span id="cb135-2"><a href="#cb135-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>a<span class="sc">}</span><span class="ss">  </span><span class="ch">\t</span><span class="sc">{</span>b<span class="sc">}</span><span class="ch">\t</span><span class="sc">{</span>c<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -899,7 +904,7 @@ else:
 <section id="reversed" class="level3">
 <h3 class="anchored" data-anchor-id="reversed">Reversed</h3>
 <p><code>reversed</code> reverses the order of sequences:</p>
-<div id="473553ed" class="cell" data-execution_count="54">
+<div id="1743cec3" class="cell" data-execution_count="54">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb137"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb137-1"><a href="#cb137-1" aria-hidden="true" tabindex="-1"></a><span class="bu">list</span>(<span class="bu">reversed</span>(<span class="bu">range</span>(<span class="dv">10</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="54">
 <pre><code>[9, 8, 7, 6, 5, 4, 3, 2, 1, 0]</code></pre>
@@ -909,7 +914,54 @@ else:
 </section>
 <section id="list-set-and-dictionary-comprehensions" class="level2">
 <h2 class="anchored" data-anchor-id="list-set-and-dictionary-comprehensions">List, Set, and Dictionary Comprehensions</h2>
+<p>Now it get’s fancy! Python seems to have a lot of sytax implemented to avoid having to spell out the for-loop sytax every time.</p>
+<p>For example, there is a syntax that applies a function to each element of a sequence:</p>
+<div id="cbc33e2b" class="cell" data-execution_count="55">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb139"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb139-1"><a href="#cb139-1" aria-hidden="true" tabindex="-1"></a>[expression <span class="cf">for</span> value <span class="kw">in</span> collection <span class="cf">if</span> condition]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>So we could apply the method <code>upper</code> to all elements in a list of strings that have more than two letters like so:</p>
+<div id="3421e586" class="cell" data-execution_count="56">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb140"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb140-1"><a href="#cb140-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the list of strings</span></span>
+<span id="cb140-2"><a href="#cb140-2" aria-hidden="true" tabindex="-1"></a>strings <span class="op">=</span> [<span class="st">"a"</span>, <span class="st">"as"</span>, <span class="st">"Lasagna"</span>, <span class="st">"Caramel"</span>, <span class="st">"breath"</span>, <span class="st">"you"</span>]</span>
+<span id="cb140-3"><a href="#cb140-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb140-4"><a href="#cb140-4" aria-hidden="true" tabindex="-1"></a><span class="co"># According to the syntax above it goes</span></span>
+<span id="cb140-5"><a href="#cb140-5" aria-hidden="true" tabindex="-1"></a>[x.upper() <span class="cf">for</span> x <span class="kw">in</span> strings <span class="cf">if</span> <span class="bu">len</span>(x) <span class="op">&gt;</span> <span class="dv">2</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="55">
+<pre><code>['LASAGNA', 'CARAMEL', 'BREATH', 'YOU']</code></pre>
+</div>
+</div>
+<p>Ah, but the only the applicable strings are returned, so we filter out the short ones. Probably a way to concatenate, or append them back together…</p>
+<p>The same sytax goes for sets and dictionaries, just with <code>{}</code> for the <code>[]</code>.</p>
+<p>An alternative to this is the <code>map</code> function with the syntax <code>map(function(), sequence_object)</code>. If we wanted to get the length for each string we could go:</p>
+<div id="39f6a2b1" class="cell" data-execution_count="57">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb142"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb142-1"><a href="#cb142-1" aria-hidden="true" tabindex="-1"></a><span class="bu">list</span>(<span class="bu">map</span>(<span class="bu">len</span>, strings))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="56">
+<pre><code>[1, 2, 7, 7, 6, 3]</code></pre>
+</div>
+</div>
+<p>And something again with <code>enumerate</code>…</p>
+<section id="nested-list-comprehensions" class="level3">
+<h3 class="anchored" data-anchor-id="nested-list-comprehensions">Nested List Comprehensions</h3>
+<p>Hmm, so for nested lists its quite a brain exercise because the sytax makes it possible, but it’s hard to keep track what part refers to which level.</p>
+<p>Let’s see. I make a list of tuples first:</p>
+<div id="66d2dcc2" class="cell" data-execution_count="58">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb144"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb144-1"><a href="#cb144-1" aria-hidden="true" tabindex="-1"></a>tuple_list <span class="op">=</span> [(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>), (<span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>), (<span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Now, let’s refer to the tuples as tup, and each element of the tuple as num. Then the expression for just having all the nums in a list would be:</p>
+<div id="9ec584c7" class="cell" data-execution_count="59">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb145"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb145-1"><a href="#cb145-1" aria-hidden="true" tabindex="-1"></a>num_list <span class="op">=</span> [num <span class="cf">for</span> tup <span class="kw">in</span> tuple_list <span class="cf">for</span> num <span class="kw">in</span> tup]</span>
+<span id="cb145-2"><a href="#cb145-2" aria-hidden="true" tabindex="-1"></a>num_list</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="58">
+<pre><code>[1, 2, 3, 4, 5, 6, 7, 8, 9]</code></pre>
+</div>
+</div>
+<p>This reads a bit backwards. So for each tup in tuple_list and each num within a tup return the num.</p>
+<p>I’m getting a little bit of traction I guess…</p>
 </section>
+</section>
+</section>
+<section id="functions" class="level1">
+<h1>3.2 Functions</h1>
 </section>
 
 </main>

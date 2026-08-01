@@ -1,9 +1,11 @@
 ---
 title: "Chapter 2"
+subtitle: "Python Language Basics, IPython, and Jupyter Notebooks"
 author: "Max Arthur Hachemeister"
 format: html
 ipynb-shell-interactivity: all
 toc: true
+date: last-modified
 ---
 
 # Prerequisites
@@ -14,7 +16,7 @@ toc: true
 ::: {.callout-note}
 
 I set the YAML variable `ipynb-shell-interacivity` to `all` at some point to have the output of all the calls instead of only the last one.
-So some mentiones here are about that, when I didn't yet know of that option.
+So some mentions here are about that, when I didn't yet know of that option.
 
 However, I still wonder how Wes did it for his Book rendering.
 

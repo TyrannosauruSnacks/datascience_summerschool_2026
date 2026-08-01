@@ -1,6 +1,6 @@
 ---
-title: "chapter 3 - Built-In Data Structures, Functions, and Files"
-subtiltle: ""
+title: "Chapter 3"
+subtitle: "Built-In Data Structures, Functions, and Files"
 author: "Max Arthur Hachemeister"
 format: html
 ipynb-shell-interactivity: all
