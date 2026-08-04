@@ -36,3 +36,12 @@ Good, positron does not accept the nix instance of python, but I now removed the
 default python version, with that of `uv`. Seems fine.
 
 Well, I've got it going now. 
+
+## 2026-08-04
+
+Keyboard inputs were off. Was pressing ctr-j on bone layout, but got ctrl-q action in positron.
+Was not the case for other apps like firefox.
+
+Changed Setting "Keyboard - Dispatch" to "keyCode". Now working as expected.
+
+Rendering of callouts in github flavoured markdown does not work in the preview, but It seems that github can render it.
