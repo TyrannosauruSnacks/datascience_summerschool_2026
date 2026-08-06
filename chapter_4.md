@@ -1,6 +1,6 @@
 # 4 NumPy Basics:
 Max Arthur Hachemeister
-2026-08-05
+2026-08-06
 
 - [Prerequisites](#prerequisites)
 - [Introduction](#introduction)
@@ -10,6 +10,8 @@ Max Arthur Hachemeister
   - [Data Types for `ndarray`s](#data-types-for-ndarrays)
   - [Arithmetic with NumPy Arrays](#arithmetic-with-numpy-arrays)
   - [Basic Indexing and Slicing](#basic-indexing-and-slicing)
+    - [Indexing with Slices](#indexing-with-slices)
+  - [Boolean Indexing](#boolean-indexing)
 
 # Prerequisites
 
@@ -39,6 +41,7 @@ Performance check:
 ``` python
 import numpy as np
 
+from argparse import Namespace
 from numpy import float64
 # Create array and list with 1e6 integers.
 my_arr = np.arange(1_000_000)
@@ -50,8 +53,8 @@ my_list = list(range(1_000_000))
 %timeit my_list_2 = [x * 2 for x in my_list]
 ```
 
-    1.34 ms ± 24 μs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
-    97.6 ms ± 15.1 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+    1.39 ms ± 41.1 μs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+    76.3 ms ± 1.89 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 
 # 4.1 The NumPy `ndarray`: A Multidimensional Array Object
 
@@ -86,8 +89,8 @@ data + data
            [ 0. , -6. , 13. ]])
 
 All of the elements of an ndarray must be of the same type-like integer,
-or string, etc.. Every array has a `shape` that describes its dimesions,
-and a `dtype` describing its datatype
+or string, etc.. Every array has a `shape` that describes its
+dimensions, and a `dtype` describing its datatype
 
 Let’s see that for our `data` object:
 
@@ -184,13 +187,13 @@ np.empty((2, 3, 2))
            [0., 0., 0., 0., 0., 0.],
            [0., 0., 0., 0., 0., 0.]])
 
-    array([[[ 4.68417113e-310,  0.00000000e+000],
-            [ 6.90128425e-310,  2.00223048e+173],
-            [ 6.90128425e-310,  6.90128425e-310]],
+    array([[[4.64091295e-310, 0.00000000e+000],
+            [0.00000000e+000, 0.00000000e+000],
+            [0.00000000e+000, 0.00000000e+000]],
 
-           [[-4.29193869e-226,  6.90128427e-310],
-            [ 6.90128427e-310, -4.96546012e-073],
-            [ 6.90128427e-310,  6.90128427e-310]]])
+           [[0.00000000e+000, 0.00000000e+000],
+            [0.00000000e+000, 0.00000000e+000],
+            [0.00000000e+000, 0.00000000e+000]]])
 
 As you can see, `np.empty()` just points to some memory, and this might
 still have some residual values from another use before.
@@ -214,7 +217,7 @@ np.array(range(15))
 
 Every ndarray comes with a `dtype` object attached to it describing the
 array’s data type. Data types are important for functions to handle data
-more efficiently by infering the most appropriate methods for each.
+more efficiently by inferring the most appropriate methods for each.
 Glossing over the technical details of different types of data is
 usually no problem, until it is.
 
@@ -347,6 +350,381 @@ arr_2 > arr
            [ True, False,  True]])
 
 There are some more intricacies to operations with arrays of different
-sizes, which is called *broadcasting*. We will gloss over this for now.
+sizes, which is called *broadcasting*.
+
+We will gloss over this for now.
 
 ## Basic Indexing and Slicing
+
+If you think about it, you might yet be missing the intuition for
+indexing an slicing multidimensional arrays–if that is something you
+ever pondered at all.
+
+One-dimensional arrays are simple, as they basically behave like Python
+lists:
+
+``` python
+# Create an array of 10 integers, starting from 0.
+arr = np.arange(10)
+
+# Return the element at index 5.
+arr[5]
+
+# Return the elements from index 5 to exclusively 8.
+arr[5:8]
+
+# Assign the value 12 to the elements from index 5 to exclusively 8.
+arr[5:8] = 12
+## And call the array to see the change.
+arr
+```
+
+    np.int64(5)
+
+    array([5, 6, 7])
+
+    array([ 0,  1,  2,  3,  4, 12, 12, 12,  8,  9])
+
+One important idiosycrasy of arrays is that slices of them refer to the
+original object, meaning modifications of slice objects apply (also) to
+the original object.
+
+Take a look:
+
+``` python
+# Assign a slice of `arr` to its own variable.
+arr_slice = arr[5:8]
+
+# Call it.
+arr_slice
+```
+
+    array([12, 12, 12])
+
+A change in `arr_slice` will also affect `arr`:
+
+``` python
+# Set `arr_slice` index 1 to 123456.
+arr_slice[1] = 123456
+
+# Call the original `arr`.
+arr
+```
+
+    array([     0,      1,      2,      3,      4,     12, 123456,     12,
+                8,      9])
+
+A *bare* slice `[:]` addresses all elements in an array:
+
+``` python
+arr_slice[:] = 7353
+
+# Checking the original again.
+arr
+```
+
+    array([   0,    1,    2,    3,    4, 7353, 7353, 7353,    8,    9])
+
+Now, higher dimensions follow this principle sytax and layer it:
+
+``` python
+# Create an array with 2 dimensions.
+arr_2d = np.array([
+  [1, 2, 3],
+  [4, 5, 6],
+  [7, 8, 9],
+])
+
+# Call the element at index 2.
+arr_2d[2]
+```
+
+    array([7, 8, 9])
+
+We now got the object at index 2 which is also an array. The element of
+which we would also call with `[]`. So the syntax allows you to stack
+these calls in one expression–and that in two equivalent variants:
+
+``` python
+# Call the element at index 0 and from that element its element at index 2.
+arr_2d[0][2]
+
+# This does the same.
+arr_2d[0, 2]
+```
+
+    np.int64(3)
+
+    np.int64(3)
+
+> [!NOTE]
+>
+> This seems to be inverse to R. So in Python `[x, y]` is
+> `[row, column]`, and in R its `[column, row]`
+>
+> No, turns out I’m wrong. R and Python share the indexin sytax for
+> multiple dimensions.
+
+When you omit some dimension in your call, the rest of the structure is
+preserved:
+
+``` python
+# Create an array with 3 dimensions.
+arr_3d = np.array([
+  [
+    [1, 2, 3],
+    [4, 5, 6]
+  ],
+  [
+    [7, 8, 9],
+    [10, 11, 12]
+  ]
+])
+
+# Call index 0 of the first layer/dimension of that array.
+arr_3d[0]
+```
+
+    array([[1, 2, 3],
+           [4, 5, 6]])
+
+Operations on those top-level calls apply to the rest of the structure.
+Both scalars and arrays work in that regard:
+
+``` python
+# Save something for an undo.
+arr_3d_undo = arr_3d[0].copy()
+
+# For the structure at the index 0 of the first layer give the value 42.
+arr_3d[0] = 42
+
+# Show me.
+arr_3d
+
+# Same as above, but apply the array we saved before to the structure.
+arr_3d[0] = arr_3d_undo
+
+# Back change undone.
+arr_3d
+```
+
+    array([[[42, 42, 42],
+            [42, 42, 42]],
+
+           [[ 7,  8,  9],
+            [10, 11, 12]]])
+
+    array([[[ 1,  2,  3],
+            [ 4,  5,  6]],
+
+           [[ 7,  8,  9],
+            [10, 11, 12]]])
+
+### Indexing with Slices
+
+Even though it already felt like we were acessing “parts” of ndarrays,
+we technically still got complete sequences. *Slicing* however refers to
+taking a selection of elements from a sequence. For this, we expand the
+above syntax with `:`.
+
+We know this already from lists, and luckily enough, one-dimensional
+arrays like our `arr` count as list in that regard.
+
+``` python
+# Call `arr` to see what we are working with.
+arr
+
+# Return the elements with from index 0 to exclusively 2.
+arr[:2]
+```
+
+    array([   0,    1,    2,    3,    4, 7353, 7353, 7353,    8,    9])
+
+    array([0, 1])
+
+> [!NOTE]
+>
+> From here on out, I will omit the “exclusively” in commentary for
+> slicing operations, and assume that you have that in mind by now.
+
+Let’s see what happens with the two-dimensinal array `arr_2d`:
+
+``` python
+# What does it look like for reference.
+arr_2d
+
+# Same call as above.
+arr_2d[:2]
+```
+
+    array([[1, 2, 3],
+           [4, 5, 6],
+           [7, 8, 9]])
+
+    array([[1, 2, 3],
+           [4, 5, 6]])
+
+Think about it, we again got two elements, but each element is a list
+now–the “rows” of our array.
+
+Just as with the indexing before, we can stack the slicing operations
+for each dimension in one call:
+
+``` python
+# From each of the first two rows, get the last two elements (everyone from index 1).
+arr_2d[:2, 1:]
+
+# Note, this is not equivalent anymore. 
+arr_2d[:2][1:]
+```
+
+    array([[2, 3],
+           [5, 6]])
+
+    array([[4, 5, 6]])
+
+> [!NOTE]
+>
+> Weird that those two variants don’t do the same thing anymore and it’s
+> not mentioned in the original book.
+
+You can mix slices with selections–so integers with `:`. Look:
+
+``` python
+# Select the second row and from that, the first two elements/columns.
+arr_2d[1, :2]
+
+# Get me the last two rows and from them, the second elements/columns.
+arr_2d[:2, 1]
+```
+
+    array([4, 5])
+
+    array([2, 5])
+
+The solo `:` (colon) selects “all”:
+
+``` python
+# From all the rows, get me the third column.
+arr_2d[:, 2]
+```
+
+    array([3, 6, 9])
+
+Note that the dimensios got dropped–we got a one dimensional array, even
+though we operated on one with two dimensions. If the dimensions weren’t
+dropped, the result should look more like this:
+
+    array([[3], 
+           [6], 
+           [9]])
+
+Assigning to multi-dimensional slice expressions applies to all
+elements:
+
+``` python
+# Take the first two rows and from that, the last two columns,
+# and assing to each of them the value 0.
+arr_2d[:2, 1:] = 0
+
+# Show me.
+arr_2d
+```
+
+    array([[1, 0, 0],
+           [4, 0, 0],
+           [7, 8, 9]])
+
+## Boolean Indexing
+
+Boolean indexing is useful to slice one set of elements that match the
+conditions of another one.
+
+Take the example of slicing only those rows that belong to a certain
+“name”. So you might get some data of trees and want only those of the
+pines.
+
+Let’s create such a dataset:
+
+``` python
+species = np.array(["Pine", "Pine", "Beech", "Oak", "Pine", "Beech"])
+
+measurements = np.array([[3, 5], [1, 8], [0, 3], [9, 5], [1, 1], [4, 7]])
+
+species
+measurements
+```
+
+    array(['Pine', 'Pine', 'Beech', 'Oak', 'Pine', 'Beech'], dtype='<U5')
+
+    array([[3, 5],
+           [1, 8],
+           [0, 3],
+           [9, 5],
+           [1, 1],
+           [4, 7]])
+
+Let’s take this one step each. We can check each element of `species`
+for the string “Pine”:
+
+``` python
+species == "Pine"
+```
+
+    array([ True,  True, False, False,  True, False])
+
+And this can be used as guide for slicing from `measurements`:
+
+``` python
+measurements[species == "Pine"]
+```
+
+    array([[3, 5],
+           [1, 8],
+           [1, 1]])
+
+These boolean operations can also be mixed with other selections or
+slices:
+
+``` python
+# Get me all the rows that correspond to "Pine" and from that, the last two columns.
+measurements[species == "Pine", 1:]
+
+# Same rows as above, but now only select the second column.
+measurements[species == "Pine", 1]
+```
+
+    array([[5],
+           [8],
+           [1]])
+
+    array([5, 8, 1])
+
+Use `!=` (“everything but”) to invert your slicing:
+
+``` python
+# Get me all the rows but those with "Pine".
+measurements[species != "Pine"]
+```
+
+    array([[0, 3],
+           [9, 5],
+           [4, 7]])
+
+For this, there is also the “prepend-`~`” variant, which is more
+convenient when you have your condition check already as an object, for
+example.
+
+Like so:
+
+``` python
+# Assign the resulting condition check to a variable.
+condition_check = species == "Pine"
+
+# Get me all rows but the ones that match the condition.
+measurements[~condition_check]
+```
+
+    array([[0, 3],
+           [9, 5],
+           [4, 7]])

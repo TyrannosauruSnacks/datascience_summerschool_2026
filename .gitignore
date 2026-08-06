@@ -1,5 +1,6 @@
 /.quarto/
 **/*.quarto_ipynb
+.jupyter_cache/
 .jupyter_cache/__version__.txt
 .jupyter_cache/global.db
 .jupyter_cache/executed/56311a1fff2b17fec9147bb9345495a7/base.ipynb

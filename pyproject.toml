@@ -28,6 +28,7 @@ dependencies = [
     "requests",
     "sqlalchemy",
     "pytz",
+    "python-cache"
 ]
 
 [tool.uv.workspace]
