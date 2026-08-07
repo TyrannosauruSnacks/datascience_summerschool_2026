@@ -27,7 +27,6 @@ Performance check:
 ```{python}
 import numpy as np
 
-from argparse import Namespace
 from numpy import float64
 # Create array and list with 1e6 integers.
 my_arr = np.arange(1_000_000)
@@ -511,3 +510,289 @@ condition_check = species == "Pine"
 # Get me all rows but the ones that match the condition.
 measurements[~condition_check]
 ```
+
+Boolean operators also work with this. For example, to slice the oaks and also the pines, you could write:
+
+```{python}
+# Just to prove the operators are working.
+pine_oak = (species == "Pine") | (species == "Oak")
+pine_oak
+
+# Use that boolean list to slice from the data.
+measurements[pine_oak]
+
+# This is equivalent.
+measurements[(species == "Pine") | (species == "Oak")]
+```
+
+Also, you can directly assing new values via boolean slicing:
+
+```{python}
+# Set all the measuremenst of Beeches to 0.
+measurements[species == "Beech"] = 0
+measurements
+```
+
+## Fancy Indexing
+The term *fancy indexing* is coined by NumPy and means indexing via integer arrays.
+It's better to show, I guess. 
+
+Let's create data to work with:
+
+```{python}
+# Create an 8 by 4 ndarray with all zeros.
+arr = np.zeros((8, 4))
+
+# Populate each row with the same integer as its index.
+for i in range(8):
+  arr[i] = i
+
+# Show me.
+arr
+```
+
+Now the integer arrays. If you wanted to select no only a single row, or a fixed range, but rather different rows at different locations, you can pass their indices as list within the index call:
+
+```{python}
+arr[[3, 0, 1, 4]]
+```
+
+Note that the return respects the order of the list you gave.
+
+This also works with negative integers to counting the index from the end backwards–which might be practical for larger datasets:
+
+```{python}
+arr[[-3, -4, -1]]
+```
+
+Now here comes something to wrap your head around, or at least be aware of its existence. First, create new data to help observe what the code after that does to it:
+
+```{python}
+# I want each element in an 8 by 4 array to have its value in ascending order
+# from left to right, top to bottom.
+arr = np.arange(32).reshape((8,4))
+arr
+```
+
+Passing multiple arrays for indexing has a particular behaviour. Read the code and think of what you expect to happen, whether that is reflected in the result, and if not, why that is:
+
+```{python}
+arr[[1, 3, 7, 5], [0, 3, 1, 2]]
+```
+
+Some might have expected to get an array made up of the rows 1, 3, 7, 5, and the columns 0, 3, 1, 2–as it worked with basic indexing and slicing. But the return now is a one-dimensional array. So the two lists we passed to the indexing became paired tuples to select the elements `(1, 0), (3, 3), (7, 1), (5, 2)`.
+
+If we actually wanted to select whole rows and colmns we need to explicitly write it as separate steps–one to first select all the rows, and the second to select from those the intended colums:
+
+```{python}
+arr[[1, 3, 7, 5]][:, [0, 3, 1, 2]]
+```
+
+Just to be aware of: Assigning the return of fancy indexing to a variable will copy the data, but assigning new values to an fancy index selection will modify the original object.
+
+## Transposing Arrays and Swapping Axes
+ndarrays have the `transpose` method and the special `T` attribute. They are somewhat comparable to the "pivot" functions in the R tidyverse.
+
+Let's see:
+
+```{python}
+# Create an ndarray for inspection.
+arr = np.arange(15).reshape((3,5))
+arr
+
+# Check out the `T` attribute.
+arr.T
+
+# The `T` attriute is the short version for this:
+arr.transpose()
+```
+
+
+::: {.callout-note}
+
+Something about the applicability of the transpose for matrix computations.
+I skipped this, and also the `swapaxes`. Can't wrap my head around it right now.
+:::
+
+# 4.2 Pseudorandom Number Generation
+Numpy has its own module for generating random numbers, called `numpy.random`. This is written to be more efficient/faster than the built-in `random` mudule.
+
+With this, you can easily generate random samples/values from a given distribution, and that even for multiple dimensions of ndarrays:
+
+```{python}
+# Create a 4 by 4 array with random values from the standard normal distribution.
+samples = np.random.standard_normal(size = (4, 4))
+samples
+```
+
+Here is a speed comparison between the built-in `random` and `numpy.random` module:
+
+```{python}
+# Just taking the one attribute from the module.
+from random import normalvariate
+
+N = 1_000_000
+
+%timeit samples = [normalvariate(0, 1) for _ in range(N)]
+
+%timeit np.random.standard_normal(N)
+```
+
+The random numbers are "pseudorandom", meaning they are generated in relation to a seed.
+This is usefull for reproducibility, as you can set this `seed` and use it for according methods:
+
+```{python}
+rng = np.random.default_rng(seed = 123456)
+
+data = rng.standard_normal((2, 3))
+data
+```
+
+# 4.3 Universal Functions: Fast Element-Wise Array Functions
+Universal functions–ufunc for short– are basically quick access versions of functions that are often applied to ndarrays.
+For example, `numpy.sqrt` and `numpy.exp`:
+
+```{python}
+arr = np.arange(10)
+arr
+
+np.sqrt(arr)
+
+np.exp(arr)
+```
+
+As the functions above take just one array input they are referred to as *unary* ufuncs.
+Therefore there are also *binary* ufuncs, with two arrays as input, but still returning one single array.
+
+For example `numpy.maximun`:
+
+```{python}
+x = rng.standard_normal(8)
+y = rng.standard_normal(8)
+
+x
+y
+
+np.maximum(x, y)
+```
+
+You see how the maximum for each pair of elements in `x` and `y` was computed.
+
+A few of the ufuncs actually return multiple arrays, like `numpy.modf`:
+
+```{python}
+arr = rng.standard_normal(7) * 5
+arr
+
+remainder, whole_part = np.modf(arr)
+
+remainder
+whole_part
+```
+
+And you can send the results of ufuncs directly to a variable with the `out` argument:
+
+```{python}
+# Check out our array.
+arr
+
+# Create an array of all 0 but with the same structure as `arr`.
+out = np.zeros_like(arr)
+
+# Add 1 to each element of `arr`.
+# This is not persistent.
+np.add(arr, 1)
+
+# Same as above but assing the output to a variable
+# to make it persistent.
+np.add(arr, 1, out = out)
+
+# Show me `out`.
+# We know that we created this with all 0.
+out
+```
+
+# 4.4 Array-Oriented Programming with Arrays
+ndarrays also work especially well with arithmetic operators. So functions like `sqrt(x^2 + y^2)` work without you having to write a respective for-loop.
+
+
+::: {.callout-note}
+
+Skipped some calculations and plotting of results.
+
+:::
+
+## Expressing Conditional Logic as Array Operations
+The `numpy.where` function is handy for operating only on those elements that fit a certain condition. For example to encode all occurences of a tree species.
+
+Let's create some data to work with:
+
+```{python}
+species = np.array(["beech", "beech", "oak", "oak", "pine", "oak"])
+height = np.array([15.1, 17.6, 11.6, 12.8, 9.1, 18.3])
+diameter = np.array([26.1, 24.6, 20.1, 22.7, 19.9, 28.4])
+```
+
+Now encode all beeches according to the german inventory species code "RBU":
+
+```{python}
+np.where(species == "beech", "RBU", species)
+```
+
+Or we could put all the measurements in groups by saying all above 15 are get the value 10 and all below the value 10:
+
+```{python}
+np.where(height >= 15, "Tall", "Small")
+```
+
+## Mathematical & Statistical Methods
+Mathematical and statistical aggregations, like `sum`, `mean` or `std`, are available both as methods for arrays and as top level `numpy` funtions.
+
+Let's create some random data an get some aggregations:
+
+```{python}
+arr = rng.standard_normal((5, 4))
+
+arr
+
+arr.mean()
+
+# Equivalent to the above
+np.mean(arr)
+
+arr.sum()
+```
+
+Instead of the aggregate across all columns and rows, you can also have the aggregations for each individual row/column with the `axis` argument. Here, `axis = 0` refers to "down the rows/all elements of each column" and `axis = 1` refers to "across the columns/ all elements of each row":
+
+```{python}
+arr.mean(axis = 0)
+
+arr.sum(axis = 1)
+```
+
+Other methods, like `cumsum` or `cumprod` return arrays of intermediate steps (accumulate). For arrays with one dimension you'd get something like:
+
+```{python}
+# Create an 1d array.
+arr = np.arange(8)
+arr
+
+arr.cumsum()
+```
+
+For multidimensional arrays the same functions accumulate for each individual lower dimension according to the given axis:
+
+```{python}
+# Create a 2d array.
+arr = np.arange(9).reshape((3, 3))
+arr
+
+# Cumsum down the rows.
+arr.cumsum(axis = 0)
+
+# Cumsum across the columns.
+arr.cumsum(axis = 1)
+```
+
+## Methods for Boolean Arrays

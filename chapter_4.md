@@ -41,7 +41,6 @@ Performance check:
 ``` python
 import numpy as np
 
-from argparse import Namespace
 from numpy import float64
 # Create array and list with 1e6 integers.
 my_arr = np.arange(1_000_000)
@@ -126,10 +125,7 @@ Nested sequences become individual dimensions in an array:
 
 ``` python
 # Create a list of two lists.
-data_2 = [
-    [1, 2, 3, 4],
-    [5, 6, 7, 8]
-]
+data_2 = [[1, 2, 3, 4], [5, 6, 7, 8]]
 
 # Make it an array.
 arr_2 = np.array(data_2)
@@ -297,10 +293,20 @@ individual elements without having to write a `for` loop:
 ``` python
 # Create an array of two lists.
 arr = np.array(
-  [[1, 2, 3,],
-  [4, 5, 6,]],
-  dtype = np.float64 # Making it float to fit later operations.
-  )
+    [
+        [
+            1,
+            2,
+            3,
+        ],
+        [
+            4,
+            5,
+            6,
+        ],
+    ],
+    dtype=np.float64,  # Making it float to fit later operations.
+)
 
 # Multiply `arr` by `arr` (basically square).
 arr * arr
@@ -337,10 +343,16 @@ With comparison operators and array with Boolean values is returned:
 ``` python
 # Create an array for comparison.
 arr_2 = np.array(
-  [[0, 4, 1,],
-  [7, 2, 12]],
-  dtype = np.float64
-  )
+    [
+        [
+            0,
+            4,
+            1,
+        ],
+        [7, 2, 12],
+    ],
+    dtype=np.float64,
+)
 
 # Which elements of `arr_2` are bigger than their `arr` neighbor.
 arr_2 > arr
@@ -429,11 +441,13 @@ Now, higher dimensions follow this principle sytax and layer it:
 
 ``` python
 # Create an array with 2 dimensions.
-arr_2d = np.array([
-  [1, 2, 3],
-  [4, 5, 6],
-  [7, 8, 9],
-])
+arr_2d = np.array(
+    [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+    ]
+)
 
 # Call the element at index 2.
 arr_2d[2]
@@ -470,16 +484,7 @@ preserved:
 
 ``` python
 # Create an array with 3 dimensions.
-arr_3d = np.array([
-  [
-    [1, 2, 3],
-    [4, 5, 6]
-  ],
-  [
-    [7, 8, 9],
-    [10, 11, 12]
-  ]
-])
+arr_3d = np.array([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])
 
 # Call index 0 of the first layer/dimension of that array.
 arr_3d[0]
@@ -574,7 +579,7 @@ for each dimension in one call:
 # From each of the first two rows, get the last two elements (everyone from index 1).
 arr_2d[:2, 1:]
 
-# Note, this is not equivalent anymore. 
+# Note, this is not equivalent anymore.
 arr_2d[:2][1:]
 ```
 
