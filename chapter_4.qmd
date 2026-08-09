@@ -796,3 +796,144 @@ arr.cumsum(axis = 1)
 ```
 
 ## Methods for Boolean Arrays
+As the boolean values `True` and `False` are usually coerced to `1` and `0` respectively, mathematical methods like `sum` can be used to count the `True` values in an Boolean array:
+
+```{python}
+# Create 100 random values distributed around 0.
+arr = rng.standard_normal(100)
+
+# Of those values that are larger than 0, how many are there?
+(arr > 0).sum()
+
+# Of those values that are equal to or less than 0, how many are there?
+(arr <= 0).sum()
+```
+
+The methods `any` and `all` are especially useful for Boolean arrays. `any` tells you whether at least one value in an array is `True`, and `all` tells you whether all of the values are `True`:
+
+```{python}
+# Create an Boolean array.
+bools = np.array([False, False, True, False])
+
+# Are there any `True` values in the array?
+bools.any()
+
+# Are all the values `True` in the array?
+bools.all()
+```
+
+## Sorting
+NumPy arrays have the same `sort` method as Python's built-in list types:
+
+```{python}
+# Create an array with 6 random values.
+arr = rng.standard_normal(6)
+arr
+
+# Sort the values in ascending order.
+arr.sort()
+arr
+```
+
+Note, that this method mutates the object in place, changing it permanently.
+
+For arrays with multiple dimensions, you can `sort` each section along a  given axis–so either the values of each row, or of each column:
+
+```{python}
+# Create an 2d array with random numbers.
+arr = rng.standard_normal((5,3))
+arr
+
+# Sort the values in each column in ascending order.
+arr.sort(axis = 0)
+arr
+
+# Now sort the value in each row in ascending order.
+arr.sort(axis = 1)
+arr
+```
+
+Use the top-level method/function `numpy.sort` if you rather preserve your original objects and have the result returned to an new one instead:
+
+```{python}
+# Create another array.
+# Spelling it out so spare the call to see them.
+arr_2 = np.array([5, -10, 7, 0, -3])
+
+# Create another array with the values sorted in ascending order.
+arr_2_sorted = np.sort(arr_2)
+arr_2_sorted
+```
+
+## Unique and Other Set Logic
+NumPy has the `numpy.unique` function to give you just each distinct value in an array. This is the more convenient version of Python's built-in `set` function with the added bonus of also sorting the values:
+
+```{python}
+# Create an array of strings.
+names = np.array(["Ragna", "Max", "Erich", "Max", "Ragna", "Alfried", "Alfried", "Max"])
+
+# Give me only the unique values in ascending order.
+np.unique(names)
+
+# Create an array of integers.
+ints = np.array([3, 3, 2, 2, 1, 1, 4, 4, 1, 1, 2, 2, 4])
+
+# Same as above.
+np.unique(ints)
+```
+
+And here is the raw Python version:
+
+```{python}
+sorted(set(names))
+```
+
+
+::: {.callout-note}
+
+Explanation of more NumPy functions, which are interesting for comparing two arrays, and getting things like intersection, difference or the union.
+
+:::
+
+# 4.5 File Input and Output with Arrays
+NumPy can save data in its own binary `.npy` format. The functions `numpy.save` and `numpy.load` save and load such files:
+
+```{python}
+# Create an array with 10 increasing integers.
+arr = np.arange(10)
+
+# And save it to disk.
+# The `.npy` extension will be added automatically.
+np.save("./output/some_array", arr)
+```
+
+Load the file from disk to see the sucess:
+
+```{python}
+np.load("./output/some_array.npy")
+```
+
+You can also save multiple objects into on file as an `.npz` archive with the `np.savez` function:
+
+```{python}
+# Saving two copies of `arr` into a file to disk.
+np.savez("./output/array_archive", a = arr, b = arr)
+```
+
+Now when you load these archives, you get an object that behaves like a dictionary, meaning you can access the individual elements and they get only loaded when you really ask for them:
+
+```{python}
+# Load the archive and assign it to `arch`.
+arch = np.load("./output/array_archive.npz")
+
+# Get me element `b` of `arch`.
+arch["b"]
+```
+
+And you can also have the data compressed with `numpy.savez_compressed`:
+
+```{python}
+np.savez_compressed("./output/arrays_compressed", a=arr, b=arr)
+```
+
+# 4.6 Linear Algebra

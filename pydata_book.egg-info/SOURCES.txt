@@ -1,5 +1,8 @@
-hello_world.py
+LICENSE
+README.md
 pyproject.toml
+output/hello_world.py
+output/some_module.py
 pydata_book.egg-info/PKG-INFO
 pydata_book.egg-info/SOURCES.txt
 pydata_book.egg-info/dependency_links.txt

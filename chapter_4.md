@@ -1,6 +1,6 @@
 # 4 NumPy Basics:
 Max Arthur Hachemeister
-2026-08-06
+2026-08-09
 
 - [Prerequisites](#prerequisites)
 - [Introduction](#introduction)
@@ -12,6 +12,25 @@ Max Arthur Hachemeister
   - [Basic Indexing and Slicing](#basic-indexing-and-slicing)
     - [Indexing with Slices](#indexing-with-slices)
   - [Boolean Indexing](#boolean-indexing)
+  - [Fancy Indexing](#fancy-indexing)
+  - [Transposing Arrays and Swapping
+    Axes](#transposing-arrays-and-swapping-axes)
+- [4.2 Pseudorandom Number
+  Generation](#42-pseudorandom-number-generation)
+- [4.3 Universal Functions: Fast Element-Wise Array
+  Functions](#43-universal-functions-fast-element-wise-array-functions)
+- [4.4 Array-Oriented Programming with
+  Arrays](#44-array-oriented-programming-with-arrays)
+  - [Expressing Conditional Logic as Array
+    Operations](#expressing-conditional-logic-as-array-operations)
+  - [Mathematical & Statistical
+    Methods](#mathematical--statistical-methods)
+  - [Methods for Boolean Arrays](#methods-for-boolean-arrays)
+  - [Sorting](#sorting)
+  - [Unique and Other Set Logic](#unique-and-other-set-logic)
+- [4.5 File Input and Output with
+  Arrays](#45-file-input-and-output-with-arrays)
+- [4.6 Linear Algebra](#46-linear-algebra)
 
 # Prerequisites
 
@@ -52,8 +71,8 @@ my_list = list(range(1_000_000))
 %timeit my_list_2 = [x * 2 for x in my_list]
 ```
 
-    1.39 ms ± 41.1 μs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
-    76.3 ms ± 1.89 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+    1.26 ms ± 173 μs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+    51.3 ms ± 608 μs per loop (mean ± std. dev. of 7 runs, 10 loops each)
 
 # 4.1 The NumPy `ndarray`: A Multidimensional Array Object
 
@@ -125,7 +144,10 @@ Nested sequences become individual dimensions in an array:
 
 ``` python
 # Create a list of two lists.
-data_2 = [[1, 2, 3, 4], [5, 6, 7, 8]]
+data_2 = [
+    [1, 2, 3, 4],
+    [5, 6, 7, 8]
+]
 
 # Make it an array.
 arr_2 = np.array(data_2)
@@ -183,7 +205,7 @@ np.empty((2, 3, 2))
            [0., 0., 0., 0., 0., 0.],
            [0., 0., 0., 0., 0., 0.]])
 
-    array([[[4.64091295e-310, 0.00000000e+000],
+    array([[[4.67903582e-310, 0.00000000e+000],
             [0.00000000e+000, 0.00000000e+000],
             [0.00000000e+000, 0.00000000e+000]],
 
@@ -293,20 +315,10 @@ individual elements without having to write a `for` loop:
 ``` python
 # Create an array of two lists.
 arr = np.array(
-    [
-        [
-            1,
-            2,
-            3,
-        ],
-        [
-            4,
-            5,
-            6,
-        ],
-    ],
-    dtype=np.float64,  # Making it float to fit later operations.
-)
+  [[1, 2, 3,],
+  [4, 5, 6,]],
+  dtype = np.float64 # Making it float to fit later operations.
+  )
 
 # Multiply `arr` by `arr` (basically square).
 arr * arr
@@ -343,16 +355,10 @@ With comparison operators and array with Boolean values is returned:
 ``` python
 # Create an array for comparison.
 arr_2 = np.array(
-    [
-        [
-            0,
-            4,
-            1,
-        ],
-        [7, 2, 12],
-    ],
-    dtype=np.float64,
-)
+  [[0, 4, 1,],
+  [7, 2, 12]],
+  dtype = np.float64
+  )
 
 # Which elements of `arr_2` are bigger than their `arr` neighbor.
 arr_2 > arr
@@ -441,13 +447,11 @@ Now, higher dimensions follow this principle sytax and layer it:
 
 ``` python
 # Create an array with 2 dimensions.
-arr_2d = np.array(
-    [
-        [1, 2, 3],
-        [4, 5, 6],
-        [7, 8, 9],
-    ]
-)
+arr_2d = np.array([
+  [1, 2, 3],
+  [4, 5, 6],
+  [7, 8, 9],
+])
 
 # Call the element at index 2.
 arr_2d[2]
@@ -484,7 +488,16 @@ preserved:
 
 ``` python
 # Create an array with 3 dimensions.
-arr_3d = np.array([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])
+arr_3d = np.array([
+  [
+    [1, 2, 3],
+    [4, 5, 6]
+  ],
+  [
+    [7, 8, 9],
+    [10, 11, 12]
+  ]
+])
 
 # Call index 0 of the first layer/dimension of that array.
 arr_3d[0]
@@ -579,7 +592,7 @@ for each dimension in one call:
 # From each of the first two rows, get the last two elements (everyone from index 1).
 arr_2d[:2, 1:]
 
-# Note, this is not equivalent anymore.
+# Note, this is not equivalent anymore. 
 arr_2d[:2][1:]
 ```
 
@@ -733,3 +746,690 @@ measurements[~condition_check]
     array([[0, 3],
            [9, 5],
            [4, 7]])
+
+Boolean operators also work with this. For example, to slice the oaks
+and also the pines, you could write:
+
+``` python
+# Just to prove the operators are working.
+pine_oak = (species == "Pine") | (species == "Oak")
+pine_oak
+
+# Use that boolean list to slice from the data.
+measurements[pine_oak]
+
+# This is equivalent.
+measurements[(species == "Pine") | (species == "Oak")]
+```
+
+    array([ True,  True, False,  True,  True, False])
+
+    array([[3, 5],
+           [1, 8],
+           [9, 5],
+           [1, 1]])
+
+    array([[3, 5],
+           [1, 8],
+           [9, 5],
+           [1, 1]])
+
+Also, you can directly assing new values via boolean slicing:
+
+``` python
+# Set all the measuremenst of Beeches to 0.
+measurements[species == "Beech"] = 0
+measurements
+```
+
+    array([[3, 5],
+           [1, 8],
+           [0, 0],
+           [9, 5],
+           [1, 1],
+           [0, 0]])
+
+## Fancy Indexing
+
+The term *fancy indexing* is coined by NumPy and means indexing via
+integer arrays. It’s better to show, I guess.
+
+Let’s create data to work with:
+
+``` python
+# Create an 8 by 4 ndarray with all zeros.
+arr = np.zeros((8, 4))
+
+# Populate each row with the same integer as its index.
+for i in range(8):
+  arr[i] = i
+
+# Show me.
+arr
+```
+
+    array([[0., 0., 0., 0.],
+           [1., 1., 1., 1.],
+           [2., 2., 2., 2.],
+           [3., 3., 3., 3.],
+           [4., 4., 4., 4.],
+           [5., 5., 5., 5.],
+           [6., 6., 6., 6.],
+           [7., 7., 7., 7.]])
+
+Now the integer arrays. If you wanted to select no only a single row, or
+a fixed range, but rather different rows at different locations, you can
+pass their indices as list within the index call:
+
+``` python
+arr[[3, 0, 1, 4]]
+```
+
+    array([[3., 3., 3., 3.],
+           [0., 0., 0., 0.],
+           [1., 1., 1., 1.],
+           [4., 4., 4., 4.]])
+
+Note that the return respects the order of the list you gave.
+
+This also works with negative integers to counting the index from the
+end backwards–which might be practical for larger datasets:
+
+``` python
+arr[[-3, -4, -1]]
+```
+
+    array([[5., 5., 5., 5.],
+           [4., 4., 4., 4.],
+           [7., 7., 7., 7.]])
+
+Now here comes something to wrap your head around, or at least be aware
+of its existence. First, create new data to help observe what the code
+after that does to it:
+
+``` python
+# I want each element in an 8 by 4 array to have its value in ascending order
+# from left to right, top to bottom.
+arr = np.arange(32).reshape((8,4))
+arr
+```
+
+    array([[ 0,  1,  2,  3],
+           [ 4,  5,  6,  7],
+           [ 8,  9, 10, 11],
+           [12, 13, 14, 15],
+           [16, 17, 18, 19],
+           [20, 21, 22, 23],
+           [24, 25, 26, 27],
+           [28, 29, 30, 31]])
+
+Passing multiple arrays for indexing has a particular behaviour. Read
+the code and think of what you expect to happen, whether that is
+reflected in the result, and if not, why that is:
+
+``` python
+arr[[1, 3, 7, 5], [0, 3, 1, 2]]
+```
+
+    array([ 4, 15, 29, 22])
+
+Some might have expected to get an array made up of the rows 1, 3, 7, 5,
+and the columns 0, 3, 1, 2–as it worked with basic indexing and slicing.
+But the return now is a one-dimensional array. So the two lists we
+passed to the indexing became paired tuples to select the elements
+`(1, 0), (3, 3), (7, 1), (5, 2)`.
+
+If we actually wanted to select whole rows and colmns we need to
+explicitly write it as separate steps–one to first select all the rows,
+and the second to select from those the intended colums:
+
+``` python
+arr[[1, 3, 7, 5]][:, [0, 3, 1, 2]]
+```
+
+    array([[ 4,  7,  5,  6],
+           [12, 15, 13, 14],
+           [28, 31, 29, 30],
+           [20, 23, 21, 22]])
+
+Just to be aware of: Assigning the return of fancy indexing to a
+variable will copy the data, but assigning new values to an fancy index
+selection will modify the original object.
+
+## Transposing Arrays and Swapping Axes
+
+ndarrays have the `transpose` method and the special `T` attribute. They
+are somewhat comparable to the “pivot” functions in the R tidyverse.
+
+Let’s see:
+
+``` python
+# Create an ndarray for inspection.
+arr = np.arange(15).reshape((3,5))
+arr
+
+# Check out the `T` attribute.
+arr.T
+
+# The `T` attriute is the short version for this:
+arr.transpose()
+```
+
+    array([[ 0,  1,  2,  3,  4],
+           [ 5,  6,  7,  8,  9],
+           [10, 11, 12, 13, 14]])
+
+    array([[ 0,  5, 10],
+           [ 1,  6, 11],
+           [ 2,  7, 12],
+           [ 3,  8, 13],
+           [ 4,  9, 14]])
+
+    array([[ 0,  5, 10],
+           [ 1,  6, 11],
+           [ 2,  7, 12],
+           [ 3,  8, 13],
+           [ 4,  9, 14]])
+
+> [!NOTE]
+>
+> Something about the applicability of the transpose for matrix
+> computations. I skipped this, and also the `swapaxes`. Can’t wrap my
+> head around it right now.
+
+# 4.2 Pseudorandom Number Generation
+
+Numpy has its own module for generating random numbers, called
+`numpy.random`. This is written to be more efficient/faster than the
+built-in `random` mudule.
+
+With this, you can easily generate random samples/values from a given
+distribution, and that even for multiple dimensions of ndarrays:
+
+``` python
+# Create a 4 by 4 array with random values from the standard normal distribution.
+samples = np.random.standard_normal(size = (4, 4))
+samples
+```
+
+    array([[ 0.9358903 , -0.66518846, -1.0822056 , -0.50805893],
+           [ 0.89406221, -0.05554117, -0.76836956, -0.8421976 ],
+           [-0.87303321, -0.16506152, -0.93497801,  0.56731301],
+           [ 0.37167935, -1.44100292, -0.47352194,  0.27962568]])
+
+Here is a speed comparison between the built-in `random` and
+`numpy.random` module:
+
+``` python
+# Just taking the one attribute from the module.
+from random import normalvariate
+
+N = 1_000_000
+
+%timeit samples = [normalvariate(0, 1) for _ in range(N)]
+
+%timeit np.random.standard_normal(N)
+```
+
+    473 ms ± 14.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+    23.1 ms ± 1.06 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+
+The random numbers are “pseudorandom”, meaning they are generated in
+relation to a seed. This is usefull for reproducibility, as you can set
+this `seed` and use it for according methods:
+
+``` python
+rng = np.random.default_rng(seed = 123456)
+
+data = rng.standard_normal((2, 3))
+data
+```
+
+    array([[ 0.1928212 , -0.06550702,  0.43550665],
+           [ 0.88235875,  0.37132785,  1.15998882]])
+
+# 4.3 Universal Functions: Fast Element-Wise Array Functions
+
+Universal functions–ufunc for short– are basically quick access versions
+of functions that are often applied to ndarrays. For example,
+`numpy.sqrt` and `numpy.exp`:
+
+``` python
+arr = np.arange(10)
+arr
+
+np.sqrt(arr)
+
+np.exp(arr)
+```
+
+    array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+    array([0.        , 1.        , 1.41421356, 1.73205081, 2.        ,
+           2.23606798, 2.44948974, 2.64575131, 2.82842712, 3.        ])
+
+    array([1.00000000e+00, 2.71828183e+00, 7.38905610e+00, 2.00855369e+01,
+           5.45981500e+01, 1.48413159e+02, 4.03428793e+02, 1.09663316e+03,
+           2.98095799e+03, 8.10308393e+03])
+
+As the functions above take just one array input they are referred to as
+*unary* ufuncs. Therefore there are also *binary* ufuncs, with two
+arrays as input, but still returning one single array.
+
+For example `numpy.maximun`:
+
+``` python
+x = rng.standard_normal(8)
+y = rng.standard_normal(8)
+
+x
+y
+
+np.maximum(x, y)
+```
+
+    array([ 0.37835254, -0.11718594,  2.20800921,  1.95324484, -0.53790441,
+           -0.30868175, -0.27351324,  0.71642266])
+
+    array([ 0.49172141, -0.21815082, -0.14839858,  0.26709038,  0.01414178,
+            0.81471778,  1.10047658,  0.61305867])
+
+    array([ 0.49172141, -0.11718594,  2.20800921,  1.95324484,  0.01414178,
+            0.81471778,  1.10047658,  0.71642266])
+
+You see how the maximum for each pair of elements in `x` and `y` was
+computed.
+
+A few of the ufuncs actually return multiple arrays, like `numpy.modf`:
+
+``` python
+arr = rng.standard_normal(7) * 5
+arr
+
+remainder, whole_part = np.modf(arr)
+
+remainder
+whole_part
+```
+
+    array([-2.1858097 ,  6.20980267, -8.05891961, -1.5850453 , -3.40869088,
+            3.26496065, -1.22198054])
+
+    array([-0.1858097 ,  0.20980267, -0.05891961, -0.5850453 , -0.40869088,
+            0.26496065, -0.22198054])
+
+    array([-2.,  6., -8., -1., -3.,  3., -1.])
+
+And you can send the results of ufuncs directly to a variable with the
+`out` argument:
+
+``` python
+# Check out our array.
+arr
+
+# Create an array of all 0 but with the same structure as `arr`.
+out = np.zeros_like(arr)
+
+# Add 1 to each element of `arr`.
+# This is not persistent.
+np.add(arr, 1)
+
+# Same as above but assing the output to a variable
+# to make it persistent.
+np.add(arr, 1, out = out)
+
+# Show me `out`.
+# We know that we created this with all 0.
+out
+```
+
+    array([-2.1858097 ,  6.20980267, -8.05891961, -1.5850453 , -3.40869088,
+            3.26496065, -1.22198054])
+
+    array([-1.1858097 ,  7.20980267, -7.05891961, -0.5850453 , -2.40869088,
+            4.26496065, -0.22198054])
+
+    array([-1.1858097 ,  7.20980267, -7.05891961, -0.5850453 , -2.40869088,
+            4.26496065, -0.22198054])
+
+    array([-1.1858097 ,  7.20980267, -7.05891961, -0.5850453 , -2.40869088,
+            4.26496065, -0.22198054])
+
+# 4.4 Array-Oriented Programming with Arrays
+
+ndarrays also work especially well with arithmetic operators. So
+functions like `sqrt(x^2 + y^2)` work without you having to write a
+respective for-loop.
+
+> [!NOTE]
+>
+> Skipped some calculations and plotting of results.
+
+## Expressing Conditional Logic as Array Operations
+
+The `numpy.where` function is handy for operating only on those elements
+that fit a certain condition. For example to encode all occurences of a
+tree species.
+
+Let’s create some data to work with:
+
+``` python
+species = np.array(["beech", "beech", "oak", "oak", "pine", "oak"])
+height = np.array([15.1, 17.6, 11.6, 12.8, 9.1, 18.3])
+diameter = np.array([26.1, 24.6, 20.1, 22.7, 19.9, 28.4])
+```
+
+Now encode all beeches according to the german inventory species code
+“RBU”:
+
+``` python
+np.where(species == "beech", "RBU", species)
+```
+
+    array(['RBU', 'RBU', 'oak', 'oak', 'pine', 'oak'], dtype='<U5')
+
+Or we could put all the measurements in groups by saying all above 15
+are get the value 10 and all below the value 10:
+
+``` python
+np.where(height >= 15, "Tall", "Small")
+```
+
+    array(['Tall', 'Tall', 'Small', 'Small', 'Small', 'Tall'], dtype='<U5')
+
+## Mathematical & Statistical Methods
+
+Mathematical and statistical aggregations, like `sum`, `mean` or `std`,
+are available both as methods for arrays and as top level `numpy`
+funtions.
+
+Let’s create some random data an get some aggregations:
+
+``` python
+arr = rng.standard_normal((5, 4))
+
+arr
+
+arr.mean()
+
+# Equivalent to the above
+np.mean(arr)
+
+arr.sum()
+```
+
+    array([[-1.11359349, -0.16136165,  0.13035288, -1.30021389],
+           [-0.9064342 , -1.76571409, -0.13530755,  0.08626036],
+           [ 0.6060993 ,  1.22908319,  1.57168118, -0.52202565],
+           [-0.03897298,  0.02745358,  1.2884647 , -0.00265976],
+           [-0.52343401,  0.04762014,  0.34583066,  0.65692281]])
+
+    np.float64(-0.023997422194462863)
+
+    np.float64(-0.023997422194462863)
+
+    np.float64(-0.4799484438892573)
+
+Instead of the aggregate across all columns and rows, you can also have
+the aggregations for each individual row/column with the `axis`
+argument. Here, `axis = 0` refers to “down the rows/all elements of each
+column” and `axis = 1` refers to “across the columns/ all elements of
+each row”:
+
+``` python
+arr.mean(axis = 0)
+
+arr.sum(axis = 1)
+```
+
+    array([-0.39526708, -0.12458376,  0.64020438, -0.21634322])
+
+    array([-2.44481615, -2.72119547,  2.88483802,  1.27428555,  0.52693961])
+
+Other methods, like `cumsum` or `cumprod` return arrays of intermediate
+steps (accumulate). For arrays with one dimension you’d get something
+like:
+
+``` python
+# Create an 1d array.
+arr = np.arange(8)
+arr
+
+arr.cumsum()
+```
+
+    array([0, 1, 2, 3, 4, 5, 6, 7])
+
+    array([ 0,  1,  3,  6, 10, 15, 21, 28])
+
+For multidimensional arrays the same functions accumulate for each
+individual lower dimension according to the given axis:
+
+``` python
+# Create a 2d array.
+arr = np.arange(9).reshape((3, 3))
+arr
+
+# Cumsum down the rows.
+arr.cumsum(axis = 0)
+
+# Cumsum across the columns.
+arr.cumsum(axis = 1)
+```
+
+    array([[0, 1, 2],
+           [3, 4, 5],
+           [6, 7, 8]])
+
+    array([[ 0,  1,  2],
+           [ 3,  5,  7],
+           [ 9, 12, 15]])
+
+    array([[ 0,  1,  3],
+           [ 3,  7, 12],
+           [ 6, 13, 21]])
+
+## Methods for Boolean Arrays
+
+As the boolean values `True` and `False` are usually coerced to `1` and
+`0` respectively, mathematical methods like `sum` can be used to count
+the `True` values in an Boolean array:
+
+``` python
+# Create 100 random values distributed around 0.
+arr = rng.standard_normal(100)
+
+# Of those values that are larger than 0, how many are there?
+(arr > 0).sum()
+
+# Of those values that are equal to or less than 0, how many are there?
+(arr <= 0).sum()
+```
+
+    np.int64(55)
+
+    np.int64(45)
+
+The methods `any` and `all` are especially useful for Boolean arrays.
+`any` tells you whether at least one value in an array is `True`, and
+`all` tells you whether all of the values are `True`:
+
+``` python
+# Create an Boolean array.
+bools = np.array([False, False, True, False])
+
+# Are there any `True` values in the array?
+bools.any()
+
+# Are all the values `True` in the array?
+bools.all()
+```
+
+    np.True_
+
+    np.False_
+
+## Sorting
+
+NumPy arrays have the same `sort` method as Python’s built-in list
+types:
+
+``` python
+# Create an array with 6 random values.
+arr = rng.standard_normal(6)
+arr
+
+# Sort the values in ascending order.
+arr.sort()
+arr
+```
+
+    array([ 0.74542065,  1.3738326 ,  0.33899004, -1.31835123, -0.41362706,
+            0.53525167])
+
+    array([-1.31835123, -0.41362706,  0.33899004,  0.53525167,  0.74542065,
+            1.3738326 ])
+
+Note, that this method mutates the object in place, changing it
+permanently.
+
+For arrays with multiple dimensions, you can `sort` each section along a
+given axis–so either the values of each row, or of each column:
+
+``` python
+# Create an 2d array with random numbers.
+arr = rng.standard_normal((5,3))
+arr
+
+# Sort the values in each column in ascending order.
+arr.sort(axis = 0)
+arr
+
+# Now sort the value in each row in ascending order.
+arr.sort(axis = 1)
+arr
+```
+
+    array([[-1.14699704,  0.24348457,  0.38604951],
+           [ 0.25189489, -0.4157989 , -0.6538536 ],
+           [-0.9519222 ,  1.04081189,  2.76645115],
+           [-1.46114923,  0.21975188, -0.31943937],
+           [-0.16177183, -0.25293288,  0.47501254]])
+
+    array([[-1.46114923, -0.4157989 , -0.6538536 ],
+           [-1.14699704, -0.25293288, -0.31943937],
+           [-0.9519222 ,  0.21975188,  0.38604951],
+           [-0.16177183,  0.24348457,  0.47501254],
+           [ 0.25189489,  1.04081189,  2.76645115]])
+
+    array([[-1.46114923, -0.6538536 , -0.4157989 ],
+           [-1.14699704, -0.31943937, -0.25293288],
+           [-0.9519222 ,  0.21975188,  0.38604951],
+           [-0.16177183,  0.24348457,  0.47501254],
+           [ 0.25189489,  1.04081189,  2.76645115]])
+
+Use the top-level method/function `numpy.sort` if you rather preserve
+your original objects and have the result returned to an new one
+instead:
+
+``` python
+# Create another array.
+# Spelling it out so spare the call to see them.
+arr_2 = np.array([5, -10, 7, 0, -3])
+
+# Create another array with the values sorted in ascending order.
+arr_2_sorted = np.sort(arr_2)
+arr_2_sorted
+```
+
+    array([-10,  -3,   0,   5,   7])
+
+## Unique and Other Set Logic
+
+NumPy has the `numpy.unique` function to give you just each distinct
+value in an array. This is the more convenient version of Python’s
+built-in `set` function with the added bonus of also sorting the values:
+
+``` python
+# Create an array of strings.
+names = np.array(["Ragna", "Max", "Erich", "Max", "Ragna", "Alfried", "Alfried", "Max"])
+
+# Give me only the unique values in ascending order.
+np.unique(names)
+
+# Create an array of integers.
+ints = np.array([3, 3, 2, 2, 1, 1, 4, 4, 1, 1, 2, 2, 4])
+
+# Same as above.
+np.unique(ints)
+```
+
+    array(['Alfried', 'Erich', 'Max', 'Ragna'], dtype='<U7')
+
+    array([1, 2, 3, 4])
+
+And here is the raw Python version:
+
+``` python
+sorted(set(names))
+```
+
+    [np.str_('Alfried'), np.str_('Erich'), np.str_('Max'), np.str_('Ragna')]
+
+> [!NOTE]
+>
+> Explanation of more NumPy functions, which are interesting for
+> comparing two arrays, and getting things like intersection, difference
+> or the union.
+
+# 4.5 File Input and Output with Arrays
+
+NumPy can save data in its own binary `.npy` format. The functions
+`numpy.save` and `numpy.load` save and load such files:
+
+``` python
+# Create an array with 10 increasing integers.
+arr = np.arange(10)
+
+# And save it to disk.
+# The `.npy` extension will be added automatically.
+np.save("./output/some_array", arr)
+```
+
+Load the file from disk to see the sucess:
+
+``` python
+np.load("./output/some_array.npy")
+```
+
+    array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+You can also save multiple objects into on file as an `.npz` archive
+with the `np.savez` function:
+
+``` python
+# Saving two copies of `arr` into a file to disk.
+np.savez("./output/array_archive", a = arr, b = arr)
+```
+
+Now when you load these archives, you get an object that behaves like a
+dictionary, meaning you can access the individual elements and they get
+only loaded when you really ask for them:
+
+``` python
+# Load the archive and assign it to `arch`.
+arch = np.load("./output/array_archive.npz")
+
+# Get me element `b` of `arch`.
+arch["b"]
+```
+
+    array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+And you can also have the data compressed with `numpy.savez_compressed`:
+
+``` python
+np.savez_compressed("./output/arrays_compressed", a=arr, b=arr)
+```
+
+# 4.6 Linear Algebra
