@@ -1,6 +1,6 @@
 # 4 NumPy Basics:
 Max Arthur Hachemeister
-2026-08-09
+2026-08-10
 
 - [Prerequisites](#prerequisites)
 - [Introduction](#introduction)
@@ -31,10 +31,11 @@ Max Arthur Hachemeister
 - [4.5 File Input and Output with
   Arrays](#45-file-input-and-output-with-arrays)
 - [4.6 Linear Algebra](#46-linear-algebra)
+- [Example: Random Walks](#example-random-walks)
 
 # Prerequisites
 
-- [Link to chapter](https://wesmckinney.com/book/numpy-basics)
+- [to chapter](https://wesmckinney.com/book/numpy-basics)
 
 # Introduction
 
@@ -71,8 +72,8 @@ my_list = list(range(1_000_000))
 %timeit my_list_2 = [x * 2 for x in my_list]
 ```
 
-    1.26 ms ± 173 μs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
-    51.3 ms ± 608 μs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+    1.11 ms ± 38.5 μs per loop (mean ± std. dev. of 7 runs, 1,000 loops each)
+    53.9 ms ± 2.81 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 
 # 4.1 The NumPy `ndarray`: A Multidimensional Array Object
 
@@ -205,13 +206,13 @@ np.empty((2, 3, 2))
            [0., 0., 0., 0., 0., 0.],
            [0., 0., 0., 0., 0., 0.]])
 
-    array([[[4.67903582e-310, 0.00000000e+000],
-            [0.00000000e+000, 0.00000000e+000],
-            [0.00000000e+000, 0.00000000e+000]],
+    array([[[ 4.63718943e-310,  0.00000000e+000],
+            [ 6.94960161e-310,  1.13515354e-274],
+            [ 6.94960161e-310,  6.94960161e-310]],
 
-           [[0.00000000e+000, 0.00000000e+000],
-            [0.00000000e+000, 0.00000000e+000],
-            [0.00000000e+000, 0.00000000e+000]]])
+           [[-2.04553419e-219,  6.94960133e-310],
+            [ 6.94960133e-310, -1.72377630e-070],
+            [ 6.94960133e-310,  6.94960133e-310]]])
 
 As you can see, `np.empty()` just points to some memory, and this might
 still have some residual values from another use before.
@@ -952,10 +953,10 @@ samples = np.random.standard_normal(size = (4, 4))
 samples
 ```
 
-    array([[ 0.9358903 , -0.66518846, -1.0822056 , -0.50805893],
-           [ 0.89406221, -0.05554117, -0.76836956, -0.8421976 ],
-           [-0.87303321, -0.16506152, -0.93497801,  0.56731301],
-           [ 0.37167935, -1.44100292, -0.47352194,  0.27962568]])
+    array([[ 0.20062172, -0.01543623,  1.53893595, -0.5007774 ],
+           [ 0.88062558,  1.57299243,  0.79396864, -0.79302941],
+           [ 0.11892488,  0.39796907, -0.17777073,  1.94841738],
+           [ 2.20878686,  0.66168574,  2.32678356,  0.56444306]])
 
 Here is a speed comparison between the built-in `random` and
 `numpy.random` module:
@@ -971,8 +972,8 @@ N = 1_000_000
 %timeit np.random.standard_normal(N)
 ```
 
-    473 ms ± 14.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
-    23.1 ms ± 1.06 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+    485 ms ± 18.3 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+    22.7 ms ± 284 μs per loop (mean ± std. dev. of 7 runs, 10 loops each)
 
 The random numbers are “pseudorandom”, meaning they are generated in
 relation to a seed. This is usefull for reproducibility, as you can set
@@ -1433,3 +1434,62 @@ np.savez_compressed("./output/arrays_compressed", a=arr, b=arr)
 ```
 
 # 4.6 Linear Algebra
+
+There are also methods, functions, and operators for arrays that allow
+linear algebra operations with them. When multiplying two 2d-arrays with
+`*` you get the element-wise product, while actual matrix
+multiplications are called with either the `dot` function or the `@`
+operator. `dot` is available as both array method or `numpy` function:
+
+``` python
+# Create two 2d arrays for multiplication.
+x = np.array([
+  [1., 2., 3.],
+  [4., 5., 6.]
+])
+
+y = np.array([
+  [6., 23.],
+  [-1, 7],
+  [8, 9]
+])
+
+# Get the product via the method.
+x.dot(y)
+
+# This is the same with the to-level function.
+np.dot(x, y)
+```
+
+    array([[ 28.,  64.],
+           [ 67., 181.]])
+
+    array([[ 28.,  64.],
+           [ 67., 181.]])
+
+The `@` operator does the same as above. Let’s just do it while also
+making another point. The point being that the results of these
+calculations get reduced whenever possible. In the case of multiplying a
+2d-array with a 1d one, the result will be also 1d, so even though it
+looks like columns you read the results for each row now from left to
+right:
+
+``` python
+# Multiply x with an 1d-array of only ones.
+x @ np.ones(3)
+```
+
+    array([ 6., 15.])
+
+> [!NOTE]
+>
+> Some more about matrix stuff from the `numpy.linalg` package. I
+> skipped that, as I have no clue and so far could avoid
+> directliy/conciously dealing with this.
+
+# Example: Random Walks
+
+> [!NOTE]
+>
+> I read this part but will skip it for my notes. Still too low level
+> for my skillset and application of Python for data analysis.

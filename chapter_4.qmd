@@ -11,7 +11,7 @@ date: last-modified
 ---
 
 # Prerequisites
-- [Link to chapter](https://wesmckinney.com/book/numpy-basics)
+- [to chapter](https://wesmckinney.com/book/numpy-basics)
 
 # Introduction
 > "[…] Python a language of choice for wrapping legacy C, C++, or FORTRAN codebases […]"
@@ -937,3 +937,48 @@ np.savez_compressed("./output/arrays_compressed", a=arr, b=arr)
 ```
 
 # 4.6 Linear Algebra
+There are also methods, functions, and operators for arrays that allow linear algebra operations with them. When multiplying two 2d-arrays with `*` you get the element-wise product, while actual matrix multiplications are called with either the `dot` function or the `@` operator. `dot` is available as both array method or `numpy` function:
+
+```{python}
+# Create two 2d arrays for multiplication.
+x = np.array([
+  [1., 2., 3.],
+  [4., 5., 6.]
+])
+
+y = np.array([
+  [6., 23.],
+  [-1, 7],
+  [8, 9]
+])
+
+# Get the product via the method.
+x.dot(y)
+
+# This is the same with the to-level function.
+np.dot(x, y)
+```
+
+The `@` operator does the same as above. Let's just do it while also making another point. The point being that the results of these calculations get reduced whenever possible. In the case of multiplying a 2d-array with a 1d one, the result will be also 1d, so even though it looks like columns you read the results for each row now from left to right:
+
+```{python}
+# Multiply x with an 1d-array of only ones.
+x @ np.ones(3)
+```
+
+
+::: {.callout-note}
+
+Some more about matrix stuff from the `numpy.linalg` package.
+I skipped that, as I have no clue and so far could avoid directliy/conciously dealing with this.
+
+:::
+
+# Example: Random Walks
+
+
+::: {.callout-note}
+
+I read this part but will skip it for my notes. Still too low level for my skillset and application of Python for data analysis.
+
+:::
