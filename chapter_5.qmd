@@ -1,0 +1,337 @@
+---
+title: "Getting Started with pandas"
+subtitle: ""
+author: "Max Arthur Hachemeister"
+date: last-modified
+toc: true
+format: gfm
+ipynb-shell-interactivity: all
+execute:
+    cache: true
+---
+
+# Prerequisites
+[Link to chapter](https://wesmckinney.com/book/pandas-basics)
+
+Import packages:
+```{python}
+#| label: setup
+
+# General packages:
+import numpy as np
+import pandas as pd
+
+# Direct import for convenience:
+from pandas import Series, DataFrame
+```
+
+# 5.1 Introduction to pandas Data Structures
+pandas introduces the *Series* and *DataFrame* object types, which are extensions of of the NumPy *ndarray* we've been working with in the last chapter.
+
+## Series
+A Series is a one-dimensional array-like object.
+So it contains a sequence of values of the same type, and–this is the pandas addition–an associated array of data labels, called its *index*. Let's take a look:
+
+
+::: {.callout-note}
+
+I will omit the "Create object..." comment, as I expect you to be able to make sense of the according lines of code without such commentary.
+
+:::
+
+```{python}
+obj = pd.Series([4, 7, -5, 3])
+obj
+```
+
+What you see retured are the index column on the left and the actual values on the right. We can specify this index, but by default it will take integers starting from `0` till `Number of Elements - 1`. You can get either of those columns via the `array` or `index` attribute:
+
+```{python}
+obj.array
+
+obj.index
+```
+
+You give individual values for the index. They can also be of the string type:
+
+```{python}
+obj_2 = pd.Series(
+    [4, 7, -5, 3], 
+    index = ["d", "b", "a", "c"]
+    )
+obj_2
+
+obj_2.index
+```
+
+One feature panda brings with the string index is that you can select elements, or a range of them, directly by those labels:
+
+```{python}
+obj_2["a"]
+
+# Assign the value 6 to the element with the "b" label.
+obj_2["d"] = 6
+
+obj_2[["c", "a", "d"]]
+```
+
+Each element in a Series preserves its index value (keeps its identity) throughout rearranging operations like filtering, scalar multiplication, or other math functions:
+
+```{python}
+# Give me all elements with positive values.
+obj_2[obj_2 > 0]
+
+# Multiply all each element by 2.
+obj_2 * 2
+
+# Take the exponent of each element.
+np.exp(obj_2)
+```
+
+A Series is technically an ordered dictionary with the index as key and the data as values. So dictionary functions are also applicable:
+
+```{python}
+# Is there an element with key/index "b"?
+"b" in obj_2
+
+# Is there an element with key/index "e"?
+"e" in obj_2
+```
+
+You can even directly transform Python dictionaries into Series:
+
+```{python}
+sdata = {
+    "Ohio": 35000,
+    "Texas": 71000,
+    "Oregon": 16000,
+    "Utah": 5000
+    }
+
+# Cast `sdata` into a series.
+obj_3 = pd.Series(sdata)
+obj_3
+```
+
+And Series have their own `to_dict` method to become dictionaries:
+
+```{python}
+obj_3.to_dict()
+```
+
+When converting dictionaries to Series the index order of the series follows that of the keys by default. Use the `index` argument to set a different order for the index:
+
+```{python}
+# Define the order of index values.
+states_order = ["California", "Ohio", "Oregon", "Texas"]
+
+obj_4 = pd.Series(sdata, index = states_order)
+obj_4
+```
+
+Note, how the index `"California"` got `NaN` (Not a Number) as value, and `"Utah"` didn't make it from the dictionary into the series. `pd.Series()` will respect the index values given by both creating them regardless of their presence in the input object and dropping those elements whose keys weren't called.
+
+To detect "missing", "NA", or "Null" values–or the other way around–use pandas `isna` and `notna` functions:
+
+```{python}
+pd.isna(obj_4)
+
+pd.notna(obj_4)
+```
+
+Well, Series also have these as methods:
+
+```{python}
+obj_4.isna()
+```
+
+A relevant feature for arithmetic operations with Series is that the data gets automatically alinged by index values:
+
+```{python}
+obj_3
+
+obj_4
+
+obj_3 + obj_4
+```
+
+The Series object and its index have a `name` attribute that can be set, and then integrates well with further pandas operations:
+
+```{python}
+obj_4.name = "population"
+
+obj_4.index.name = "state"
+
+obj_4
+```
+
+::: {.callout-note}
+
+I personally would give `state` its own column, but since we're still talking about series here, this would probably the more efficient way to have that information stored
+
+:::
+
+The index of Series can be, and are, altered in place by an assignmet operation:
+
+```{python}
+obj
+
+obj.index = ["Lasagna", "Alfried", "Steward", "Ragna"]
+obj
+```
+
+## DataFrame
+
+Now, the DataFrame is a rectangular table of data…
+
+::: {.callout-note}
+
+**rectangular** *table* of data seems redundant to me, because a table is usually rectangular by definition, consisting of rows and columns.
+
+Ah well, if I think about it there is a point about separating matrices from tables as they have different arithmetic rules. But that's a pretty specific point, which might confuse at least those–like me–that kinda glossed over, or never really had, matrices in high school.
+
+:::
+
+…and contains an ordererd, named collection of columns (each containing their respective rows). The individual columns can have different value types and still be part of the same DataFrame. Furthemore, both rows and columns have an index. While the columns get their index by default from the keys of the input dictionary, the rows index will be ascending integers starting from 0 by default.
+
+Let's create a dictionary first, and then convert it to a DataFrame:
+
+```{python}
+data = {"state": ["Ohio", "Ohio", "Ohio", "Nevada", "Nevada", "Nevada"],
+        "year": [2000, 2001, 2002, 2001, 2002, 2003],
+        "pop": [1.5, 1.7, 3.6, 2.4, 2.9, 3.2]}
+
+frame = pd.DataFrame(data)
+```
+
+Now, the keys become the index for the colums, and the rows get indexed automatically:
+
+```{python}
+frame
+```
+
+And then we have methods like `head` and `tail` to get a look at the firs or last five rows, resepectively:
+
+```{python}
+frame.head()
+
+frame.tail()
+```
+
+You can rearrange the columns by giving the current or source DataFrame as input to `pd.DataFrame` and the desired order as a sequence to the `columns` argument:
+
+```{python}
+pd.DataFrame(frame, columns = ["year", "state", "pop"])
+```
+
+And just as with Series, DataFrame will respect your sequence and create columns that you gave but might not have existed in the input object, and populate them with `NaN`:
+
+```{python}
+pd.DataFrame(frame, columns = ["year", "state", "pop", "lasagna"])
+```
+
+Get a single column as a Series either by dictionary call, or as a dot attribute:
+
+```{python}
+frame["pop"]
+
+frame.year
+```
+
+Rows on the other hand can be retrieved with special `loc` and `iloc` attributes–which are useful in later contexts, and their difference will be elaborated soon:
+
+```{python}
+# Second row
+frame.loc[1]
+
+# Third row
+frame.iloc[2]
+```
+
+So colums are not renamed, but their elements modified by assigning values to their index:
+
+```{python}
+# Scalars are broadcast.
+frame["debt"] = 16.5
+frame
+
+# Arrays work as well.
+frame["debt"] = np.arange(6.)
+frame
+```
+
+Assigning lists or arrays to DataFrame columns only works when their lengths match. With a series on the other hand values get aligned to existing indices while all other become `NaN`:
+
+```{python}
+#| error: true
+
+val = pd.Series([-1.2, -1.5, -1.7], index = [2, 4, 5])
+
+frame["debt"] = val
+frame
+
+frame["debt"] = [1, 1, 2]
+```
+
+With the `del` *keyword* columns can be deleted via a dictionary call. Let's create some columns first:
+
+```{python}
+# Create a column named "eastern" where the values are true
+# when value of the column "state" of the same row is "Ohio".
+frame["eastern"] = frame["state"] == "Ohio"
+frame
+```
+
+Now let's delete that same column again:
+
+```{python}
+del frame["eastern"]
+
+frame.columns
+```
+
+You will regularly get dictionaries nested into dictionaries like:
+
+```{python}
+populations = {
+    "Ohio": {2000: 1.5, 2001: 1.7, 2002: 3.6},
+    "Nevada": {2001: 2.4, 2002: 2.9}
+}
+```
+
+If you pass that to a DataFrame, the outer keys are still the column index, but the inner dictionaries get resolved by setting their keys as row index and the values as values:
+
+```{python}
+frame_3 = pd.DataFrame(populations)
+frame_3
+```
+
+Swap rows and columns with the `T` method–just like with NumPy arrays:
+
+```{python}
+frame_3.T
+```
+
+Be aware that when setting an index values from the input that don't match are ommitted:
+
+```{python}
+# We're loosing `2000` here.
+pd.DataFrame(populations, index = [2001, 2002, 2003])
+```
+
+Series nested within dictionaries are resolved the same as nested dictionaries into a DataFrame:
+
+```{python}
+pdata = {
+    # We're getting lists from indexing them out of the `frame_3` object.
+    # Assing to the key `Ohio`:
+    # From `frame_3`, column `Ohio`, every but the last row.
+    "Ohio": frame_3["Ohio"][:-1],
+    # Assign the the key `Nevada`:
+    # From `frame_3` , column `Nevada`, get the first two rows.
+    "Nevada": frame_3["Nevada"][:2],
+}
+
+# Make pdata a DataFrame
+pd.DataFrame(pdata)
+```
