@@ -239,6 +239,7 @@ frame.year
 ```
 
 Rows on the other hand, can be retrieved with special `loc` and `iloc` attributes–which are useful in later contexts, and their difference will be elaborated soon:
+Rows on the other hand, can be retrieved with special `loc` and `iloc` attributes–which are useful in later contexts, and their difference will be elaborated soon:
 
 ```{python}
 # Second row
@@ -248,6 +249,7 @@ frame.loc[1]
 frame.iloc[2]
 ```
 
+So colums are not renamed, but their elements modified, by assigning values to their index:
 So colums are not renamed, but their elements modified, by assigning values to their index:
 
 ```{python}
@@ -261,6 +263,7 @@ frame
 ```
 
 Assigning lists or arrays to DataFrame columns only works when their lengths match. With a series on the other hand, values get aligned to existing indices while all other become `NaN`:
+Assigning lists or arrays to DataFrame columns only works when their lengths match. With a series on the other hand, values get aligned to existing indices while all other become `NaN`:
 
 ```{python}
 #| error: true
@@ -273,6 +276,7 @@ frame
 frame["debt"] = [1, 1, 2]
 ```
 
+With the `del` *keyword*, columns can be deleted via a dictionary call. Let's create some columns first:
 With the `del` *keyword*, columns can be deleted via a dictionary call. Let's create some columns first:
 
 ```{python}
@@ -313,12 +317,14 @@ frame_3.T
 ```
 
 Be aware that when setting an index, values from the input that don't match are ommitted:
+Be aware that when setting an index, values from the input that don't match are ommitted:
 
 ```{python}
 # We're loosing `2000` here.
 pd.DataFrame(populations, index = [2001, 2002, 2003])
 ```
 
+Series nested within dictionaries are resolved indo a DataFrame the same as nested dictionaries:
 Series nested within dictionaries are resolved indo a DataFrame the same as nested dictionaries:
 
 ```{python}
@@ -374,7 +380,7 @@ index[1:]
 Interesting, yet sensible, these index objects are immutable– their elements cannot be manually altered in place:
 
 ```{python}
-#| error: false
+#| error: true
 
 index[1] = "Lasagna"
 ```
@@ -441,7 +447,7 @@ obj_3 = pd.Series(
     )
 obj_3
 
-obj_3.reindex(np.arange(), method = "ffill")
+obj_3.reindex(np.arange(7), method = "ffill")
 ```
 
 And for DataFrame you can address either the index (rows), columns, or both. The index (rows) are the the default target when giving just one sequence:
@@ -449,12 +455,12 @@ And for DataFrame you can address either the index (rows), columns, or both. The
 ```{python}
 frame = pd.DataFrame(
     np.arange(9).reshape((3, 3)),
-    index = ["a", "c", "d"],
-    columns = ["Ohio", "Texas", "California"]
+    index=["a", "c", "d"],
+    columns=["Ohio", "Texas", "California"],
 )
 frame
 
-frame_2 = frame.reindex(index = ["a", "b", "c", "d"])
+frame_2 = frame.reindex(index=["a", "b", "c", "d"])
 frame_2
 ```
 
