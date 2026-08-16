@@ -238,7 +238,7 @@ frame["pop"]
 frame.year
 ```
 
-Rows on the other hand can be retrieved with special `loc` and `iloc` attributes–which are useful in later contexts, and their difference will be elaborated soon:
+Rows on the other hand, can be retrieved with special `loc` and `iloc` attributes–which are useful in later contexts, and their difference will be elaborated soon:
 
 ```{python}
 # Second row
@@ -248,7 +248,7 @@ frame.loc[1]
 frame.iloc[2]
 ```
 
-So colums are not renamed, but their elements modified by assigning values to their index:
+So colums are not renamed, but their elements modified, by assigning values to their index:
 
 ```{python}
 # Scalars are broadcast.
@@ -260,7 +260,7 @@ frame["debt"] = np.arange(6.)
 frame
 ```
 
-Assigning lists or arrays to DataFrame columns only works when their lengths match. With a series on the other hand values get aligned to existing indices while all other become `NaN`:
+Assigning lists or arrays to DataFrame columns only works when their lengths match. With a series on the other hand, values get aligned to existing indices while all other become `NaN`:
 
 ```{python}
 #| error: true
@@ -273,7 +273,7 @@ frame
 frame["debt"] = [1, 1, 2]
 ```
 
-With the `del` *keyword* columns can be deleted via a dictionary call. Let's create some columns first:
+With the `del` *keyword*, columns can be deleted via a dictionary call. Let's create some columns first:
 
 ```{python}
 # Create a column named "eastern" where the values are true
@@ -312,14 +312,14 @@ Swap rows and columns with the `T` method–just like with NumPy arrays:
 frame_3.T
 ```
 
-Be aware that when setting an index values from the input that don't match are ommitted:
+Be aware that when setting an index, values from the input that don't match are ommitted:
 
 ```{python}
 # We're loosing `2000` here.
 pd.DataFrame(populations, index = [2001, 2002, 2003])
 ```
 
-Series nested within dictionaries are resolved the same as nested dictionaries into a DataFrame:
+Series nested within dictionaries are resolved indo a DataFrame the same as nested dictionaries:
 
 ```{python}
 pdata = {
@@ -335,3 +335,166 @@ pdata = {
 # Make pdata a DataFrame
 pd.DataFrame(pdata)
 ```
+
+As with Series, the DataFrames attributes `index` and `columns` can be set, and will be displayed if so:
+
+```{python}
+frame_3.index.name = "year"
+
+frame_3.columns.name = "state"
+
+frame_3
+```
+
+This means however, than DataFrame itself does not have a `name` attribute–as opposed to Series.
+
+
+::: {.callout-note}
+
+Something about the details of the `to_numpy` method
+
+:::
+
+## Index Objects
+In pandas, the index are their own objects which can be assinged any series type to set the index values (we did this to some extent above already):
+
+```{python}
+obj = pd.Series(np.arange(3), index=["a", "b", "c"])
+
+# Here, we extract the `index`.
+index = obj.index
+
+# And see that it is an independent `object` indeed.
+index
+
+# For which regular indexing applies.
+index[1:]
+```
+
+Interesting, yet sensible, these index objects are immutable– their elements cannot be manually altered in place:
+
+```{python}
+#| error: false
+
+index[1] = "Lasagna"
+```
+
+So the structure/data type of index objects is respected when used in other functions–that's the immutability:
+
+```{python}
+# Creating a literal index object.
+labels = pd.Index(np.arange(3))
+labels
+
+# "Integrating" it into a Series.
+obj_2 = pd.Series([1.5, -2.5, 0], index = labels)
+obj_2
+
+# See, it's referencing that `label` object.
+obj_2.index is labels
+```
+
+Now you know.
+
+Values of the index can be queried:
+
+```{python}
+frame_3.columns
+
+"Ohio" in frame_3.columns
+
+2003 in frame_3.index
+```
+
+And if values occur multiple times, all of them will be returned/selected.
+
+
+::: {.callout-note}
+
+And a list of useful index methods and properties.
+
+:::
+
+# 5.2 Essential Functionality
+## Reindexing
+Knowing the above, we can now see how this translates to quite neat functonality with pandas DataFrames and Series. Let's create one to play around with:
+
+```{python}
+# Index deliberately in a perculiar order.
+obj = pd.Series([4.5, 7.2, -5.3, 3.6], index = ["d", "b", "a", "c"])
+obj
+```
+
+The `reindex` method rearranges the data according to the index you give. As shown previously, indexes that are not explicitly called for will be ommitted from the input data, and indexes for which no elements exist in the input data will be created regardless:
+
+```{python}
+obj_2 = obj.reindex(["a", "c", "d", "e"])
+obj_2
+```
+
+Within this method, there is the–wait for it–`method` keyword to address indices for which input data might be missing. For example, giving `ffil` as the argument's value will *forward fill* (repeat) the last value until the index for which a value exists again in the input data:
+
+```{python}
+obj_3 = pd.Series(
+    ["Alfried", "Lasagna", "Ragna"],
+    index = [0, 2, 5]
+    )
+obj_3
+
+obj_3.reindex(np.arange(), method = "ffill")
+```
+
+And for DataFrame you can address either the index (rows), columns, or both. The index (rows) are the the default target when giving just one sequence:
+
+```{python}
+frame = pd.DataFrame(
+    np.arange(9).reshape((3, 3)),
+    index = ["a", "c", "d"],
+    columns = ["Ohio", "Texas", "California"]
+)
+frame
+
+frame_2 = frame.reindex(index = ["a", "b", "c", "d"])
+frame_2
+```
+
+To reindex the columns, supply the sequence to the–well–`columns` keyword:
+
+```{python}
+states = ["Texas", "Utah", "California"]
+
+frame.reindex(columns = states)
+```
+
+A variant of this would be to supply the sequence as the first *positional* argument, and then set the direction with the `axis` keyword:
+
+```{python}
+frame.reindex(states, axis = "columns")
+```
+
+Might be more clear this way, but whatever you feel like.
+
+
+::: {.callout-note}
+
+Another table of further arguments and keywords for `reindex`.
+
+:::
+
+Quick mention of the `loc` operator–we already heard of this before, and will again shortly–that also does reindexing but refuses to create elements that did not already exist in the input, so the index sequence has to match the values of the input:
+
+```{python}
+#| error: true
+
+frame.loc[
+    ["a", "d", "c"],
+    ["California", "Texas"],
+]
+
+frame.loc[
+    ["a", "b", "c"],
+    ["California", "Texas"]
+]
+```
+
+## Dropping Entries from an Axis
