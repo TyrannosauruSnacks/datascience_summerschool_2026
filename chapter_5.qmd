@@ -239,7 +239,6 @@ frame.year
 ```
 
 Rows on the other hand, can be retrieved with special `loc` and `iloc` attributes–which are useful in later contexts, and their difference will be elaborated soon:
-Rows on the other hand, can be retrieved with special `loc` and `iloc` attributes–which are useful in later contexts, and their difference will be elaborated soon:
 
 ```{python}
 # Second row
@@ -249,7 +248,6 @@ frame.loc[1]
 frame.iloc[2]
 ```
 
-So colums are not renamed, but their elements modified, by assigning values to their index:
 So colums are not renamed, but their elements modified, by assigning values to their index:
 
 ```{python}
@@ -263,7 +261,6 @@ frame
 ```
 
 Assigning lists or arrays to DataFrame columns only works when their lengths match. With a series on the other hand, values get aligned to existing indices while all other become `NaN`:
-Assigning lists or arrays to DataFrame columns only works when their lengths match. With a series on the other hand, values get aligned to existing indices while all other become `NaN`:
 
 ```{python}
 #| error: true
@@ -276,7 +273,6 @@ frame
 frame["debt"] = [1, 1, 2]
 ```
 
-With the `del` *keyword*, columns can be deleted via a dictionary call. Let's create some columns first:
 With the `del` *keyword*, columns can be deleted via a dictionary call. Let's create some columns first:
 
 ```{python}
@@ -317,7 +313,6 @@ frame_3.T
 ```
 
 Be aware that when setting an index, values from the input that don't match are ommitted:
-Be aware that when setting an index, values from the input that don't match are ommitted:
 
 ```{python}
 # We're loosing `2000` here.
@@ -353,7 +348,6 @@ frame_3
 ```
 
 This means however, than DataFrame itself does not have a `name` attribute–as opposed to Series.
-
 
 ::: {.callout-note}
 
@@ -504,3 +498,163 @@ frame.loc[
 ```
 
 ## Dropping Entries from an Axis
+
+We learned above that we can have elements get ommitted from any axis when we leave out the according index value. This might be cumbesome, however, as you'd always have to note *all* of the label values you wanted to keep. The `drop` method will do the trick, by returning the input object with those values dropped that you give:
+
+```{python}
+obj = pd.Series(np.arange(5.), index = ["a", "b", "c", "d", "e"])
+obj
+
+# By default the row labels (axis 0) are addressed.
+new_obj = obj.drop("c")
+new_obj
+
+obj.drop(["d", "c"])
+```
+
+With DataFrame you have two options to set the addressed label axis for `drop`:
+
+```{python}
+data = pd.DataFrame(
+    np.arange(16).reshape((4, 4)),
+    index = ["Ohio", "Colorado", "Utah", "New York"],
+    columns = ["one", "two", "three", "four"],
+    )
+data
+```
+
+So row(index) labels by default:
+
+```{python}
+data.drop(index = ["Colorado", "Ohio"])
+```
+
+Now for the column labels:
+
+```{python}
+# Either with the colums argument.
+data.drop(columns = ["two"])
+
+# Or labels sequence as positional
+# and then via the axis keyword.
+data.drop("two", axis = 1)
+
+# You can also call the axis by its name.
+data.drop(["two", "four"], axis = "columns")
+```
+
+## Indexing, Selection, and Filtering
+Ah yeah, we're coming to the `loc` and `iloc` operators now.
+But first, the overall situation for the rationale. Series and DataFrame elements can be indexed, filtered and selected with `[]`, like NumPy Arrays, but you can not only give integers but also the according axis labels. Here are some examples:
+
+```{python}
+obj = pd.Series(np.arange(4.), index = ["a", "b", "c", "d"])
+obj
+
+# Get row "b".
+obj["b"]
+
+# Get rows 3 to 4.
+obj[2:4]
+
+# Get rows "a", "b", and "d" in that exact order.
+obj[["a", "b", "d"]]
+
+# Get all rows for which the value is less than 2.
+obj[obj < 2]
+
+```
+
+
+::: {.callout-note}
+
+Seems like selecting with integers, either single or list, gives an error, but ranges still work.
+
+So these calls don't work:
+
+```{python}
+#| eval: false
+
+# Get rows 3 and 4.
+obj[[2, 3]]
+
+# Get the second row.
+obj[1]
+```
+
+Ah yea, you can read it in the error report:
+
+> 957 # Note: GH#50617 in 3.0 we changed int key to always be treated as
+> 958 # a label, matching DataFrame behavior.
+
+:::
+
+So you can only use integers in indexing when the axis labels are integers, too:
+
+```{python}
+obj_2  = pd.Series(np.arange(6.))
+obj_2
+
+obj_2[1]
+
+obj_2[[2, 4]]
+
+obj_2[[0, 5, 1]]
+
+obj_2[obj_2 < 2]
+```
+
+However, you can use `iloc` to ignore labels and select by "position", solving the above error:
+
+```{python}
+obj
+obj.iloc[1]
+
+obj.iloc[[2, 3]]
+```
+
+And the `loc` indexer only works with labels and throws an error when encountering integer axis values. But, as seen above, the default behaviour of the regular index operator will let you know when you mix it up in both cases.
+
+Furthemore, when you assing values to an index call, they will be assigned to the actual values insted of the axis label:
+
+```{python}
+obj_3 = pd.Series(
+    [1, 2, 3],
+    index = ["a", "b", "c"]
+)
+obj_3
+
+obj_3.loc["b":"c"] = 5
+obj_3
+```
+
+For DataFrame, the default axis for indexing is across the columns (1):
+
+```{python}
+data = pd.DataFrame(
+    np.arange(16).reshape((4, 4)),
+    index = ["Ohio", "Colorado", "Utah", "New York"],
+    columns = ["one", "two", "three", "four"]
+)
+data
+
+data["two"]
+
+data[["three", "one"]]
+```
+
+Now, there are some further idiosycracies:
+
+```{python}
+# Slicing addresses the row axis (0).
+data[:2]
+
+# But boolean filtering only from the second layer.
+data[data["three"] > 5]
+
+# In the first layer you get `NaN`s.
+data[data > 5]
+
+# And the naked operation assings boolean values directly.
+data < 5
+```

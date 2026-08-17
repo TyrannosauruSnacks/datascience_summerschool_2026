@@ -1,6 +1,6 @@
 # Getting Started with pandas
 Max Arthur Hachemeister
-2026-08-16
+2026-08-17
 
 - [Prerequisites](#prerequisites)
 - [5.1 Introduction to pandas Data
@@ -11,6 +11,8 @@ Max Arthur Hachemeister
 - [5.2 Essential Functionality](#52-essential-functionality)
   - [Reindexing](#reindexing)
   - [Dropping Entries from an Axis](#dropping-entries-from-an-axis)
+  - [Indexing, Selection, and
+    Filtering](#indexing-selection-and-filtering)
 
 # Prerequisites
 
@@ -836,7 +838,8 @@ pd.DataFrame(populations, index = [2001, 2002, 2003])
 </div>
 
 Series nested within dictionaries are resolved indo a DataFrame the same
-as nested dictionaries:
+as nested dictionaries: Series nested within dictionaries are resolved
+indo a DataFrame the same as nested dictionaries:
 
 ``` python
 pdata = {
@@ -1332,3 +1335,500 @@ frame.loc[
     [31mKeyError[39m: "['b'] not in index"
 
 ## Dropping Entries from an Axis
+
+We learned above that we can have elements get ommitted from any axis
+when we leave out the according index value. This might be cumbesome,
+however, as you’d always have to note *all* of the label values you
+wanted to keep. The `drop` method will do the trick, by returning the
+input object with those values dropped that you give:
+
+``` python
+obj = pd.Series(np.arange(5.), index = ["a", "b", "c", "d", "e"])
+obj
+
+# By default the row labels (axis 0) are addressed.
+new_obj = obj.drop("c")
+new_obj
+
+obj.drop(["d", "c"])
+```
+
+    a    0.0
+    b    1.0
+    c    2.0
+    d    3.0
+    e    4.0
+    dtype: float64
+
+    a    0.0
+    b    1.0
+    d    3.0
+    e    4.0
+    dtype: float64
+
+    a    0.0
+    b    1.0
+    e    4.0
+    dtype: float64
+
+With DataFrame you have two options to set the addressed label axis for
+`drop`:
+
+``` python
+data = pd.DataFrame(
+    np.arange(16).reshape((4, 4)),
+    index = ["Ohio", "Colorado", "Utah", "New York"],
+    columns = ["one", "two", "three", "four"],
+    )
+data
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | one | two | three | four |
+|----------|-----|-----|-------|------|
+| Ohio     | 0   | 1   | 2     | 3    |
+| Colorado | 4   | 5   | 6     | 7    |
+| Utah     | 8   | 9   | 10    | 11   |
+| New York | 12  | 13  | 14    | 15   |
+
+</div>
+
+So row(index) labels by default:
+
+``` python
+data.drop(index = ["Colorado", "Ohio"])
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | one | two | three | four |
+|----------|-----|-----|-------|------|
+| Utah     | 8   | 9   | 10    | 11   |
+| New York | 12  | 13  | 14    | 15   |
+
+</div>
+
+Now for the column labels:
+
+``` python
+# Either with the colums argument.
+data.drop(columns = ["two"])
+
+# Or labels sequence as positional
+# and then via the axis keyword.
+data.drop("two", axis = 1)
+
+# You can also call the axis by its name.
+data.drop(["two", "four"], axis = "columns")
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | one | three | four |
+|----------|-----|-------|------|
+| Ohio     | 0   | 2     | 3    |
+| Colorado | 4   | 6     | 7    |
+| Utah     | 8   | 10    | 11   |
+| New York | 12  | 14    | 15   |
+
+</div>
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | one | three | four |
+|----------|-----|-------|------|
+| Ohio     | 0   | 2     | 3    |
+| Colorado | 4   | 6     | 7    |
+| Utah     | 8   | 10    | 11   |
+| New York | 12  | 14    | 15   |
+
+</div>
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | one | three |
+|----------|-----|-------|
+| Ohio     | 0   | 2     |
+| Colorado | 4   | 6     |
+| Utah     | 8   | 10    |
+| New York | 12  | 14    |
+
+</div>
+
+## Indexing, Selection, and Filtering
+
+Ah yeah, we’re coming to the `loc` and `iloc` operators now. But first,
+the overall situation for the rationale. Series and DataFrame elements
+can be indexed, filtered and selected with `[]`, like NumPy Arrays, but
+you can not only give integers but also the according axis labels. Here
+are some examples:
+
+``` python
+obj = pd.Series(np.arange(4.), index = ["a", "b", "c", "d"])
+obj
+
+# Get row "b".
+obj["b"]
+
+# Get rows 3 to 4.
+obj[2:4]
+
+# Get rows "a", "b", and "d" in that exact order.
+obj[["a", "b", "d"]]
+
+# Get all rows for which the value is less than 2.
+obj[obj < 2]
+```
+
+    a    0.0
+    b    1.0
+    c    2.0
+    d    3.0
+    dtype: float64
+
+    np.float64(1.0)
+
+    c    2.0
+    d    3.0
+    dtype: float64
+
+    a    0.0
+    b    1.0
+    d    3.0
+    dtype: float64
+
+    a    0.0
+    b    1.0
+    dtype: float64
+
+> [!NOTE]
+>
+> Seems like selecting with integers, either single or list, gives an
+> error, but ranges still work.
+>
+> So these calls don’t work:
+>
+> ``` python
+> # Get rows 3 and 4.
+> obj[[2, 3]]
+>
+> # Get the second row.
+> obj[1]
+> ```
+>
+> Ah yea, you can read it in the error report:
+>
+> > 957 \# Note: GH#50617 in 3.0 we changed int key to always be treated
+> > as 958 \# a label, matching DataFrame behavior.
+
+So you can only use integers in indexing when the axis labels are
+integers, too:
+
+``` python
+obj_2  = pd.Series(np.arange(6.))
+obj_2
+
+obj_2[1]
+
+obj_2[[2, 4]]
+
+obj_2[[0, 5, 1]]
+
+obj_2[obj_2 < 2]
+```
+
+    0    0.0
+    1    1.0
+    2    2.0
+    3    3.0
+    4    4.0
+    5    5.0
+    dtype: float64
+
+    np.float64(1.0)
+
+    2    2.0
+    4    4.0
+    dtype: float64
+
+    0    0.0
+    5    5.0
+    1    1.0
+    dtype: float64
+
+    0    0.0
+    1    1.0
+    dtype: float64
+
+However, you can use `iloc` to ignore labels and select by “position”,
+solving the above error:
+
+``` python
+obj
+obj.iloc[1]
+
+obj.iloc[[2, 3]]
+```
+
+    a    0.0
+    b    1.0
+    c    2.0
+    d    3.0
+    dtype: float64
+
+    np.float64(1.0)
+
+    c    2.0
+    d    3.0
+    dtype: float64
+
+And the `loc` indexer only works with labels and throws an error when
+encountering integer axis values. But, as seen above, the default
+behaviour of the regular index operator will let you know when you mix
+it up in both cases.
+
+Furthemore, when you assing values to an index call, they will be
+assigned to the actual values insted of the axis label:
+
+``` python
+obj_3 = pd.Series(
+    [1, 2, 3],
+    index = ["a", "b", "c"]
+)
+obj_3
+
+obj_3.loc["b":"c"] = 5
+obj_3
+```
+
+    a    1
+    b    2
+    c    3
+    dtype: int64
+
+    a    1
+    b    5
+    c    5
+    dtype: int64
+
+For DataFrame, the default axis for indexing is across the columns (1):
+
+``` python
+data = pd.DataFrame(
+    np.arange(16).reshape((4, 4)),
+    index = ["Ohio", "Colorado", "Utah", "New York"],
+    columns = ["one", "two", "three", "four"]
+)
+data
+
+data["two"]
+
+data[["three", "one"]]
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | one | two | three | four |
+|----------|-----|-----|-------|------|
+| Ohio     | 0   | 1   | 2     | 3    |
+| Colorado | 4   | 5   | 6     | 7    |
+| Utah     | 8   | 9   | 10    | 11   |
+| New York | 12  | 13  | 14    | 15   |
+
+</div>
+
+    Ohio         1
+    Colorado     5
+    Utah         9
+    New York    13
+    Name: two, dtype: int64
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | three | one |
+|----------|-------|-----|
+| Ohio     | 2     | 0   |
+| Colorado | 6     | 4   |
+| Utah     | 10    | 8   |
+| New York | 14    | 12  |
+
+</div>
+
+Now, there are some further idiosycracies:
+
+``` python
+# Slicing addresses the row axis (0).
+data[:2]
+
+# But boolean filtering only from the second layer.
+data[data["three"] > 5]
+
+# In the first layer you get `NaN`s.
+data[data > 5]
+
+# And the naked operation assings boolean values directly.
+data < 5
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | one | two | three | four |
+|----------|-----|-----|-------|------|
+| Ohio     | 0   | 1   | 2     | 3    |
+| Colorado | 4   | 5   | 6     | 7    |
+
+</div>
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | one | two | three | four |
+|----------|-----|-----|-------|------|
+| Colorado | 4   | 5   | 6     | 7    |
+| Utah     | 8   | 9   | 10    | 11   |
+| New York | 12  | 13  | 14    | 15   |
+
+</div>
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | one  | two  | three | four |
+|----------|------|------|-------|------|
+| Ohio     | NaN  | NaN  | NaN   | NaN  |
+| Colorado | NaN  | NaN  | 6.0   | 7.0  |
+| Utah     | 8.0  | 9.0  | 10.0  | 11.0 |
+| New York | 12.0 | 13.0 | 14.0  | 15.0 |
+
+</div>
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | one   | two   | three | four  |
+|----------|-------|-------|-------|-------|
+| Ohio     | True  | True  | True  | True  |
+| Colorado | True  | False | False | False |
+| Utah     | False | False | False | False |
+| New York | False | False | False | False |
+
+</div>
