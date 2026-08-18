@@ -646,10 +646,11 @@ data[["three", "one"]]
 Now, there are some further idiosycracies:
 
 ```{python}
-# Slicing addresses the row axis (0).
+# Slicing addresses the row axis (0),
 data[:2]
 
 # But boolean filtering only from the second layer.
+# Well, not really, but check the later example.
 data[data["three"] > 5]
 
 # In the first layer you get `NaN`s.
@@ -657,4 +658,78 @@ data[data > 5]
 
 # And the naked operation assings boolean values directly.
 data < 5
+```
+
+So with boolean filtering you can assing new values to the `True`s of the filter call. For example, assing the value 0 to *every* datapoint that is less than 5 in `data`:
+
+```{python}
+data[data < 5] = 0
+data
+```
+
+### Selection on DataFrame with Loc and Iloc
+
+`loc` and `iloc` apply to DataFrame like for Series plus the addressing of axis. Let's get a single row by label:
+
+```{python}
+data
+
+data.loc["Colorado"]
+```
+
+
+::: {.callout-caution}
+
+Typo
+>  To select multiple **roles** {rows?}, creating a new DataFrame, pass a sequence of labels:
+
+:::
+
+Passing a list of labels gives you a new DataFrame:
+
+```{python}
+data.loc[["Colorado", "New York"]]
+```
+
+You can also select certain rows of those selected columns by passing another list after a comma:
+
+```{python}
+data.loc["Colorado", ["three", "four"]]
+
+# Behaves differently if you pass the row selector as a list.
+data.loc[["Colorado"], ["three", "four"]]
+```
+
+Same syntax works for integer selection with `iloc`:
+
+```{python}
+# Get third row
+data.iloc[2]
+
+# Get rows three and two, in that exact order.
+data.iloc[[2, 1]]
+
+# Get third row of columns four, one and two, in that exact order
+data.iloc[2, [3, 0, 1]]
+
+# Get second and third row of columns four, one and two in that exact order.
+data.iloc[[1, 2], [3, 0, 1]]
+```
+
+Ah wild, you can even slice with labels and some boolean arrays:
+
+```{python}
+# All rows up to (inclusively this time) "Utah" of column two.
+data.loc[:"Utah", "two"]
+
+# All rows of all columns up to (exclusively) row four
+# and from that only the rows with values larger than 5 in column three.
+data.iloc[:, :3][data.three > 5]
+```
+
+Boolean arrays work with `loc` and `iloc` alike:
+
+```{python}
+# Get those rows with values larger or equal to 2 in column three.
+data.loc[data.three >= 2]
 ```

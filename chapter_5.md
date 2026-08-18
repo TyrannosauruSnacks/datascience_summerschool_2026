@@ -1,6 +1,6 @@
 # Getting Started with pandas
 Max Arthur Hachemeister
-2026-08-17
+2026-08-18
 
 - [Prerequisites](#prerequisites)
 - [5.1 Introduction to pandas Data
@@ -13,6 +13,8 @@ Max Arthur Hachemeister
   - [Dropping Entries from an Axis](#dropping-entries-from-an-axis)
   - [Indexing, Selection, and
     Filtering](#indexing-selection-and-filtering)
+    - [Selection on DataFrame with Loc and
+      Iloc](#selection-on-dataframe-with-loc-and-iloc)
 
 # Prerequisites
 
@@ -1735,10 +1737,11 @@ data[["three", "one"]]
 Now, there are some further idiosycracies:
 
 ``` python
-# Slicing addresses the row axis (0).
+# Slicing addresses the row axis (0),
 data[:2]
 
 # But boolean filtering only from the second layer.
+# Well, not really, but check the later example.
 data[data["three"] > 5]
 
 # In the first layer you get `NaN`s.
@@ -1830,5 +1833,271 @@ data < 5
 | Colorado | True  | False | False | False |
 | Utah     | False | False | False | False |
 | New York | False | False | False | False |
+
+</div>
+
+So with boolean filtering you can assing new values to the `True`s of
+the filter call. For example, assing the value 0 to *every* datapoint
+that is less than 5 in `data`:
+
+``` python
+data[data < 5] = 0
+data
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | one | two | three | four |
+|----------|-----|-----|-------|------|
+| Ohio     | 0   | 0   | 0     | 0    |
+| Colorado | 0   | 5   | 6     | 7    |
+| Utah     | 8   | 9   | 10    | 11   |
+| New York | 12  | 13  | 14    | 15   |
+
+</div>
+
+### Selection on DataFrame with Loc and Iloc
+
+`loc` and `iloc` apply to DataFrame like for Series plus the addressing
+of axis. Let’s get a single row by label:
+
+``` python
+data
+
+data.loc["Colorado"]
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | one | two | three | four |
+|----------|-----|-----|-------|------|
+| Ohio     | 0   | 0   | 0     | 0    |
+| Colorado | 0   | 5   | 6     | 7    |
+| Utah     | 8   | 9   | 10    | 11   |
+| New York | 12  | 13  | 14    | 15   |
+
+</div>
+
+    one      0
+    two      5
+    three    6
+    four     7
+    Name: Colorado, dtype: int64
+
+> [!CAUTION]
+>
+> Typo \> To select multiple **roles** {rows?}, creating a new
+> DataFrame, pass a sequence of labels:
+
+Passing a list of labels gives you a new DataFrame:
+
+``` python
+data.loc[["Colorado", "New York"]]
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | one | two | three | four |
+|----------|-----|-----|-------|------|
+| Colorado | 0   | 5   | 6     | 7    |
+| New York | 12  | 13  | 14    | 15   |
+
+</div>
+
+You can also select certain rows of those selected columns by passing
+another list after a comma:
+
+``` python
+data.loc["Colorado", ["three", "four"]]
+
+# Behaves differently if you pass the row selector as a list.
+data.loc[["Colorado"], ["three", "four"]]
+```
+
+    three    6
+    four     7
+    Name: Colorado, dtype: int64
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | three | four |
+|----------|-------|------|
+| Colorado | 6     | 7    |
+
+</div>
+
+Same syntax works for integer selection with `iloc`:
+
+``` python
+# Get third row
+data.iloc[2]
+
+# Get rows three and two, in that exact order.
+data.iloc[[2, 1]]
+
+# Get third row of columns four, one and two, in that exact order
+data.iloc[2, [3, 0, 1]]
+
+# Get second and third row of columns four, one and two in that exact order.
+data.iloc[[1, 2], [3, 0, 1]]
+```
+
+    one       8
+    two       9
+    three    10
+    four     11
+    Name: Utah, dtype: int64
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | one | two | three | four |
+|----------|-----|-----|-------|------|
+| Utah     | 8   | 9   | 10    | 11   |
+| Colorado | 0   | 5   | 6     | 7    |
+
+</div>
+
+    four    11
+    one      8
+    two      9
+    Name: Utah, dtype: int64
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | four | one | two |
+|----------|------|-----|-----|
+| Colorado | 7    | 0   | 5   |
+| Utah     | 11   | 8   | 9   |
+
+</div>
+
+Ah wild, you can even slice with labels and some boolean arrays:
+
+``` python
+# All rows up to (inclusively this time) "Utah" of column two.
+data.loc[:"Utah", "two"]
+
+# All rows of all columns up to (exclusively) row four
+# and from that only the rows with values larger than 5 in column three.
+data.iloc[:, :3][data.three > 5]
+```
+
+    Ohio        0
+    Colorado    5
+    Utah        9
+    Name: two, dtype: int64
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | one | two | three |
+|----------|-----|-----|-------|
+| Colorado | 0   | 5   | 6     |
+| Utah     | 8   | 9   | 10    |
+| New York | 12  | 13  | 14    |
+
+</div>
+
+Boolean arrays work with `loc` and `iloc` alike:
+
+``` python
+# Get those rows with values larger or equal to 2 in column three.
+data.loc[data.three >= 2]
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | one | two | three | four |
+|----------|-----|-----|-------|------|
+| Colorado | 0   | 5   | 6     | 7    |
+| Utah     | 8   | 9   | 10    | 11   |
+| New York | 12  | 13  | 14    | 15   |
 
 </div>
