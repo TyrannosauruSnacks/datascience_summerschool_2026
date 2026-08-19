@@ -733,3 +733,96 @@ Boolean arrays work with `loc` and `iloc` alike:
 # Get those rows with values larger or equal to 2 in column three.
 data.loc[data.three >= 2]
 ```
+
+#### Integer Indexing Pifalls
+
+Indexing with integers has some perticular behavior, which probably grew out of preventing hard to detect user errors. For example, you will get an error with the following code:
+
+```{python}
+#| error: true
+
+ser = pd.Series(np.arange(3.))
+ser
+
+ser[-1]
+```
+
+As the index of the series are integers, this indexing call can refer to either positional or label-based indexing, and pandas does not want to guess.
+
+If we were to ask the same thing from an non-integer index there is no ambiguity and the code will succeed:
+
+```{python}
+#| error: true
+
+ser_2 = pd.Series(
+    np.arange(3.),
+    index = ["a", "b", "c"]
+    )
+
+ser_2[-1]
+```
+
+
+::: {.callout-note}
+
+Ah, well, It seems this is not the case anymore. So pandas will throw an error in both cases, and you are sternly proposed to use `loc` and `iloc` for the above operations, to be really precise about the type of indexing you want–rightfully so.
+
+:::
+
+So, to be precise about what you want, use `loc` and `iloc`:
+
+```{python}
+# Select by position.
+ser.iloc[-1]
+
+# Select by label.
+ser.loc[2]
+```
+
+For your convenience however, slicing with integers will allways be positional:
+
+```{python}
+# Give me the first rows.
+ser_2[:2]
+```
+
+The jist is: Use `loc` and `iloc` whenever applicable.
+
+#### Pittfalls with Chained Indexing
+
+We've gotten to know the flexible selecting with `loc` and `iloc` by now. The next logical step is often to assign new values to these selection, which is another thing to wrap your head around first.
+
+Whole rows and columns are relatively straight forward:
+
+```{python}
+# Assign all rows of column "one" the value 1.
+data.loc[:, "one"] = 1
+data
+
+# Assign all columns of the third row the value 5.
+data.iloc[2] = 5
+data
+
+# Assign all columns of the row where
+# the value in column "four" is larger than 5 the value 3.
+data.loc[data["four"] > 5] = 3
+data
+```
+
+The thing to keep in your mind when selecting a combination of rows and columns is that when a call returns a subset, it will fail assing any values given as it does not refer to the original object anymore:
+
+```{python}
+#| error: true
+
+# This is subsetting/creating a new Series
+data.loc[data.three == 5]["three"] = 6
+```
+
+You even get a verbose error, explaining to you you that you should use the row and column indexers in the same `loc` or `iloc` call, instead of chaining them:
+
+```{python}
+data.loc[data.three == 5, "three"] = 123
+data
+```
+
+## Arithmetic and Data Alignment

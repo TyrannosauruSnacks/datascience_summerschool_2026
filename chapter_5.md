@@ -1,6 +1,6 @@
 # Getting Started with pandas
 Max Arthur Hachemeister
-2026-08-18
+2026-08-19
 
 - [Prerequisites](#prerequisites)
 - [5.1 Introduction to pandas Data
@@ -15,6 +15,7 @@ Max Arthur Hachemeister
     Filtering](#indexing-selection-and-filtering)
     - [Selection on DataFrame with Loc and
       Iloc](#selection-on-dataframe-with-loc-and-iloc)
+  - [Arithmetic and Data Alignment](#arithmetic-and-data-alignment)
 
 # Prerequisites
 
@@ -2101,3 +2102,317 @@ data.loc[data.three >= 2]
 | New York | 12  | 13  | 14    | 15   |
 
 </div>
+
+#### Integer Indexing Pifalls
+
+Indexing with integers has some perticular behavior, which probably grew
+out of preventing hard to detect user errors. For example, you will get
+an error with the following code:
+
+``` python
+ser = pd.Series(np.arange(3.))
+ser
+
+ser[-1]
+```
+
+    0    0.0
+    1    1.0
+    2    2.0
+    dtype: float64
+
+    KeyError: -1
+    [31m---------------------------------------------------------------------------[39m
+    [31mValueError[39m                                Traceback (most recent call last)
+    [36mFile [39m[32m~/projects/datascience_summerschool_2026/.venv/lib/python3.13/site-packages/pandas/core/indexes/range.py:521[39m, in [36mRangeIndex.get_loc[39m[34m(self, key)[39m
+    [32m    520[39m [38;5;28;01mtry[39;00m:
+    [32m--> [39m[32m521[39m     [38;5;28;01mreturn[39;00m [30;43mself[39;49m[30;43m.[39;49m[30;43m_range[39;49m[30;43m.[39;49m[30;43mindex[39;49m[30;43m([39;49m[30;43mnew_key[39;49m[30;43m)[39;49m
+    [32m    522[39m [38;5;28;01mexcept[39;00m [38;5;167;01mValueError[39;00m [38;5;28;01mas[39;00m err:
+
+    [31mValueError[39m: -1 is not in range
+
+    The above exception was the direct cause of the following exception:
+
+    [31mKeyError[39m                                  Traceback (most recent call last)
+    [36mCell[39m[36m [39m[32mIn[61][39m[32m, line 4[39m
+    [32m      1[39m ser = pd.Series(np.arange([32m3.[39m))
+    [32m      2[39m ser
+    [32m      3[39m 
+    [32m----> [39m[32m4[39m ser[-[32m1[39m]
+
+    [36mFile [39m[32m~/projects/datascience_summerschool_2026/.venv/lib/python3.13/site-packages/pandas/core/series.py:959[39m, in [36mSeries.__getitem__[39m[34m(self, key)[39m
+    [32m    954[39m     key = unpack_1tuple(key)
+    [32m    956[39m [38;5;28;01melif[39;00m key_is_scalar:
+    [32m    957[39m     [38;5;66;03m# Note: GH#50617 in 3.0 we changed int key to always be treated as[39;00m
+    [32m    958[39m     [38;5;66;03m#  a label, matching DataFrame behavior.[39;00m
+    [32m--> [39m[32m959[39m     [38;5;28;01mreturn[39;00m [30;43mself[39;49m[30;43m.[39;49m[30;43m_get_value[39;49m[30;43m([39;49m[30;43mkey[39;49m[30;43m)[39;49m
+    [32m    961[39m [38;5;66;03m# Convert generator to list before going through hashable part[39;00m
+    [32m    962[39m [38;5;66;03m# (We will iterate through the generator there to check for slices)[39;00m
+    [32m    963[39m [38;5;28;01mif[39;00m is_iterator(key):
+
+    [36mFile [39m[32m~/projects/datascience_summerschool_2026/.venv/lib/python3.13/site-packages/pandas/core/series.py:1046[39m, in [36mSeries._get_value[39m[34m(self, label, takeable)[39m
+    [32m   1043[39m     [38;5;28;01mreturn[39;00m [38;5;28mself[39m._values[label]
+    [32m   1045[39m [38;5;66;03m# Similar to Index.get_value, but we do not fall back to positional[39;00m
+    [32m-> [39m[32m1046[39m loc = [30;43mself[39;49m[30;43m.[39;49m[30;43mindex[39;49m[30;43m.[39;49m[30;43mget_loc[39;49m[30;43m([39;49m[30;43mlabel[39;49m[30;43m)[39;49m
+    [32m   1048[39m [38;5;28;01mif[39;00m is_integer(loc):
+    [32m   1049[39m     [38;5;28;01mreturn[39;00m [38;5;28mself[39m._values[loc]
+
+    [36mFile [39m[32m~/projects/datascience_summerschool_2026/.venv/lib/python3.13/site-packages/pandas/core/indexes/range.py:523[39m, in [36mRangeIndex.get_loc[39m[34m(self, key)[39m
+    [32m    521[39m         [38;5;28;01mreturn[39;00m [38;5;28mself[39m._range.index(new_key)
+    [32m    522[39m     [38;5;28;01mexcept[39;00m [38;5;167;01mValueError[39;00m [38;5;28;01mas[39;00m err:
+    [32m--> [39m[32m523[39m         [38;5;28;01mraise[39;00m [38;5;167;01mKeyError[39;00m(key) [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01merr[39;00m
+    [32m    524[39m [38;5;28;01mif[39;00m [38;5;28misinstance[39m(key, Hashable):
+    [32m    525[39m     [38;5;28;01mraise[39;00m [38;5;167;01mKeyError[39;00m(key)
+
+    [31mKeyError[39m: -1
+
+As the index of the series are integers, this indexing call can refer to
+either positional or label-based indexing, and pandas does not want to
+guess.
+
+If we were to ask the same thing from an non-integer index there is no
+ambiguity and the code will succeed:
+
+``` python
+ser_2 = pd.Series(
+    np.arange(3.),
+    index = ["a", "b", "c"]
+    )
+
+ser_2[-1]
+```
+
+    KeyError: -1
+    [31m---------------------------------------------------------------------------[39m
+    [31mKeyError[39m                                  Traceback (most recent call last)
+    [36mFile [39m[32m~/projects/datascience_summerschool_2026/.venv/lib/python3.13/site-packages/pandas/core/indexes/base.py:3641[39m, in [36mIndex.get_loc[39m[34m(self, key)[39m
+    [32m   3640[39m [38;5;28;01mtry[39;00m:
+    [32m-> [39m[32m3641[39m     [38;5;28;01mreturn[39;00m [30;43mself[39;49m[30;43m.[39;49m[30;43m_engine[39;49m[30;43m.[39;49m[30;43mget_loc[39;49m[30;43m([39;49m[30;43mcasted_key[39;49m[30;43m)[39;49m
+    [32m   3642[39m [38;5;28;01mexcept[39;00m [38;5;167;01mKeyError[39;00m [38;5;28;01mas[39;00m err:
+
+    [36mFile [39m[32mpandas/_libs/index.pyx:168[39m, in [36mpandas._libs.index.IndexEngine.get_loc[39m[34m()[39m
+    [32m--> [39m[32m168[39m [33m'Could not get source, probably due dynamically evaluated source code.'[39m
+
+    [36mFile [39m[32mpandas/_libs/index.pyx:176[39m, in [36mpandas._libs.index.IndexEngine.get_loc[39m[34m()[39m
+    [32m--> [39m[32m176[39m [33m'Could not get source, probably due dynamically evaluated source code.'[39m
+
+    [36mFile [39m[32mpandas/_libs/index.pyx:583[39m, in [36mpandas._libs.index.StringObjectEngine._check_type[39m[34m()[39m
+    [32m--> [39m[32m583[39m [33m'Could not get source, probably due dynamically evaluated source code.'[39m
+
+    [31mKeyError[39m: -1
+
+    The above exception was the direct cause of the following exception:
+
+    [31mKeyError[39m                                  Traceback (most recent call last)
+    [36mCell[39m[36m [39m[32mIn[62][39m[32m, line 6[39m
+    [32m      2[39m     np.arange([32m3.[39m),
+    [32m      3[39m     index = [[33m"a"[39m, [33m"b"[39m, [33m"c"[39m]
+    [32m      4[39m     )
+    [32m      5[39m 
+    [32m----> [39m[32m6[39m ser_2[-[32m1[39m]
+
+    [36mFile [39m[32m~/projects/datascience_summerschool_2026/.venv/lib/python3.13/site-packages/pandas/core/series.py:959[39m, in [36mSeries.__getitem__[39m[34m(self, key)[39m
+    [32m    954[39m     key = unpack_1tuple(key)
+    [32m    956[39m [38;5;28;01melif[39;00m key_is_scalar:
+    [32m    957[39m     [38;5;66;03m# Note: GH#50617 in 3.0 we changed int key to always be treated as[39;00m
+    [32m    958[39m     [38;5;66;03m#  a label, matching DataFrame behavior.[39;00m
+    [32m--> [39m[32m959[39m     [38;5;28;01mreturn[39;00m [30;43mself[39;49m[30;43m.[39;49m[30;43m_get_value[39;49m[30;43m([39;49m[30;43mkey[39;49m[30;43m)[39;49m
+    [32m    961[39m [38;5;66;03m# Convert generator to list before going through hashable part[39;00m
+    [32m    962[39m [38;5;66;03m# (We will iterate through the generator there to check for slices)[39;00m
+    [32m    963[39m [38;5;28;01mif[39;00m is_iterator(key):
+
+    [36mFile [39m[32m~/projects/datascience_summerschool_2026/.venv/lib/python3.13/site-packages/pandas/core/series.py:1046[39m, in [36mSeries._get_value[39m[34m(self, label, takeable)[39m
+    [32m   1043[39m     [38;5;28;01mreturn[39;00m [38;5;28mself[39m._values[label]
+    [32m   1045[39m [38;5;66;03m# Similar to Index.get_value, but we do not fall back to positional[39;00m
+    [32m-> [39m[32m1046[39m loc = [30;43mself[39;49m[30;43m.[39;49m[30;43mindex[39;49m[30;43m.[39;49m[30;43mget_loc[39;49m[30;43m([39;49m[30;43mlabel[39;49m[30;43m)[39;49m
+    [32m   1048[39m [38;5;28;01mif[39;00m is_integer(loc):
+    [32m   1049[39m     [38;5;28;01mreturn[39;00m [38;5;28mself[39m._values[loc]
+
+    [36mFile [39m[32m~/projects/datascience_summerschool_2026/.venv/lib/python3.13/site-packages/pandas/core/indexes/base.py:3648[39m, in [36mIndex.get_loc[39m[34m(self, key)[39m
+    [32m   3643[39m     [38;5;28;01mif[39;00m [38;5;28misinstance[39m(casted_key, [38;5;28mslice[39m) [38;5;129;01mor[39;00m (
+    [32m   3644[39m         [38;5;28misinstance[39m(casted_key, abc.Iterable)
+    [32m   3645[39m         [38;5;129;01mand[39;00m [38;5;28many[39m([38;5;28misinstance[39m(x, [38;5;28mslice[39m) [38;5;28;01mfor[39;00m x [38;5;129;01min[39;00m casted_key)
+    [32m   3646[39m     ):
+    [32m   3647[39m         [38;5;28;01mraise[39;00m InvalidIndexError(key) [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01merr[39;00m
+    [32m-> [39m[32m3648[39m     [38;5;28;01mraise[39;00m [38;5;167;01mKeyError[39;00m(key) [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01merr[39;00m
+    [32m   3649[39m [38;5;28;01mexcept[39;00m [38;5;167;01mTypeError[39;00m:
+    [32m   3650[39m     [38;5;66;03m# If we have a listlike key, _check_indexing_error will raise[39;00m
+    [32m   3651[39m     [38;5;66;03m#  InvalidIndexError. Otherwise we fall through and re-raise[39;00m
+    [32m   3652[39m     [38;5;66;03m#  the TypeError.[39;00m
+    [32m   3653[39m     [38;5;28mself[39m._check_indexing_error(key)
+
+    [31mKeyError[39m: -1
+
+> [!NOTE]
+>
+> Ah, well, It seems this is not the case anymore. So pandas will throw
+> an error in both cases, and you are sternly proposed to use `loc` and
+> `iloc` for the above operations, to be really precise about the type
+> of indexing you want–rightfully so.
+
+So, to be precise about what you want, use `loc` and `iloc`:
+
+``` python
+# Select by position.
+ser.iloc[-1]
+
+# Select by label.
+ser.loc[2]
+```
+
+    np.float64(2.0)
+
+    np.float64(2.0)
+
+For your convenience however, slicing with integers will allways be
+positional:
+
+``` python
+# Give me the first rows.
+ser_2[:2]
+```
+
+    a    0.0
+    b    1.0
+    dtype: float64
+
+The jist is: Use `loc` and `iloc` whenever applicable.
+
+#### Pittfalls with Chained Indexing
+
+We’ve gotten to know the flexible selecting with `loc` and `iloc` by
+now. The next logical step is often to assign new values to these
+selection, which is another thing to wrap your head around first.
+
+Whole rows and columns are relatively straight forward:
+
+``` python
+# Assign all rows of column "one" the value 1.
+data.loc[:, "one"] = 1
+data
+
+# Assign all columns of the third row the value 5.
+data.iloc[2] = 5
+data
+
+# Assign all columns of the row where
+# the value in column "four" is larger than 5 the value 3.
+data.loc[data["four"] > 5] = 3
+data
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | one | two | three | four |
+|----------|-----|-----|-------|------|
+| Ohio     | 1   | 0   | 0     | 0    |
+| Colorado | 1   | 5   | 6     | 7    |
+| Utah     | 1   | 9   | 10    | 11   |
+| New York | 1   | 13  | 14    | 15   |
+
+</div>
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | one | two | three | four |
+|----------|-----|-----|-------|------|
+| Ohio     | 1   | 0   | 0     | 0    |
+| Colorado | 1   | 5   | 6     | 7    |
+| Utah     | 5   | 5   | 5     | 5    |
+| New York | 1   | 13  | 14    | 15   |
+
+</div>
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | one | two | three | four |
+|----------|-----|-----|-------|------|
+| Ohio     | 1   | 0   | 0     | 0    |
+| Colorado | 3   | 3   | 3     | 3    |
+| Utah     | 5   | 5   | 5     | 5    |
+| New York | 3   | 3   | 3     | 3    |
+
+</div>
+
+The thing to keep in your mind when selecting a combination of rows and
+columns is that when a call returns a subset, it will fail assing any
+values given as it does not refer to the original object anymore:
+
+``` python
+# This is subsetting/creating a new Series
+data.loc[data.three == 5]["three"] = 6
+```
+
+    /tmp/ipykernel_57860/2163647394.py:2: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment.
+    Such chained assignment never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).
+
+    Try using '.loc[row_indexer, col_indexer] = value' instead, to perform the assignment in a single step.
+
+    See the documentation for a more detailed explanation: https://pandas.pydata.org/pandas-docs/stable/user_guide/copy_on_write.html#chained-assignment
+      data.loc[data.three == 5]["three"] = 6
+
+You even get a verbose error, explaining to you you that you should use
+the row and column indexers in the same `loc` or `iloc` call, instead of
+chaining them:
+
+``` python
+data.loc[data.three == 5, "three"] = 123
+data
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | one | two | three | four |
+|----------|-----|-----|-------|------|
+| Ohio     | 1   | 0   | 0     | 0    |
+| Colorado | 3   | 3   | 3     | 3    |
+| Utah     | 5   | 5   | 123   | 5    |
+| New York | 3   | 3   | 3     | 3    |
+
+</div>
+
+## Arithmetic and Data Alignment
