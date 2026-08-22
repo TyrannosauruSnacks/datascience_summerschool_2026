@@ -826,3 +826,236 @@ data
 ```
 
 ## Arithmetic and Data Alignment
+A nice data science feature of pandas it the way it treats objects with different indexes. When adding two objects, for example, the resulting object is the union of the index pairs, meaning you are not ommitting any datapoints in the process. Check it out:
+
+```{python}
+s_1 = pd.Series(
+    [7.3, -2.5, 3.4, 1.5],
+    index = ["a", "c", "d", "e"],
+)
+s_2 = pd.Series(
+    [-2.1, 3.6, -1.5, 4, 3.1,],
+    index = ["a", "c", "e", "f", "g"]
+)
+
+s_1
+s_2
+```
+
+Now, addition with those two gives you:
+
+```{python}
+s_1 + s_2
+```
+
+Where indexes do not overlap, `NaN`s are introduced and persist for future operations.
+
+Furthemore, DataFrame does the same alignment for both rows and columns:
+
+```{python}
+df_1 = pd.DataFrame(
+    np.arange(9.).reshape((3, 3)),
+    columns = list("bcd"),
+    index = ["Ohio", "Texas", "Colorado"],
+)
+
+df_2 = pd.DataFrame(
+    np.arange(12.).reshape((4, 3)),
+    columns = list("bde"),
+    index = ["Utah", "Ohio", "Texas", "Oregon"]
+)
+
+df_1
+df_2
+```
+
+Adding these yields the unions of both DataFrames' rows and columns:
+
+```{python}
+df_1 + df_2
+```
+
+And, with no common index values between DataFrames, you will get all `NaN`s:
+
+```{python}
+df_1 = pd.DataFrame({"A": [1, 2]})
+
+df_2 = pd.DataFrame({"B": [3, 4]})
+
+df_1
+
+df_2
+
+df_1 + df_2
+```
+
+### Arithmetic Methods with Fill Values
+You can change the above default value for solitary data points with the `fill_value` argument. And while we're at it, this will also use the `nan` method:
+
+```{python}
+df_1 = pd.DataFrame(
+    np.arange(12.).reshape((3, 4)),
+    columns = list("abcd")
+)
+
+df_2 = pd.DataFrame(
+    np.arange(20.).reshape((4,5)),
+    columns = list("abcde")
+)
+
+# Assing the value `NaN` to the second row of column `b`.
+df_2.loc[1, "b"] = np.nan
+
+df_2
+```
+
+Now some addition to introduce more `NaN`s:
+
+```{python}
+df_1 + df_2
+```
+
+With `+` being an operator lacking any arguments, we need to use the alternative `add` method for setting another `fill_value`:
+
+```{python}
+df_1.add(df_2, fill_value = 0)
+```
+
+Notice how the values are filled first and are passed to the arithmetic operation. Because we set `0` in the above example, solitary datapoints make it "unaltered" into the new DataFrame.
+
+There are a bunch of Series and DataFrame methods available for arithmetic operations. Check either the table in the book or the documentation. One thing to note right away is that all of these methods has an version where the arguments are reversed. So the following are equivalent:
+
+```{python}
+1 / df_1
+
+df_1.rdiv(1)
+```
+
+Which is probably nice for consitently using methods only for arithmetic.
+
+On another note, you can also supply a different fill value for reindexing:
+
+```{python}
+df_1.reindex(columns = df_2.columns, fill_value = 0)
+```
+
+### Operations Between DataFrame and Series
+The behavior for arithmatic between DataFrame is also defined for sensible and convenient returns. Let's start with an example to see how an Array behaves. We will apply a single row (Series) of this Array to itself:
+
+```{python}
+arr = np.arange(12.).reshape((3, 4))
+arr
+
+arr[0]
+
+arr - arr[0]
+```
+
+So the subtraction of the row values is applied down each row of the array. In NumPy this is referred to as *broadcasting*.
+
+pandas objects behave similarly, but additionally regard the alignment of the indexes. Let's first create some objects:
+
+```{python}
+frame = pd.DataFrame(
+    np.arange(12.).reshape((4, 3)),
+    columns = list("bde"),
+    index = ["Utah", "Ohio", "Texas", "Oregon"],
+)
+
+# Remember to prefer `loc` and `iloc` for indexing DataFrames
+series = frame.iloc[0]
+
+frame
+series
+```
+
+The default for arithmetic between pandas objects is to aling the columns and then *broadcast* down the rows:
+
+```{python}
+frame - series
+```
+
+As before, solitary DataFrame columns or Series indexes will persist as `NaN`s in the returned DataFrame:
+
+```{python}
+series_2 = pd.Series(
+    np.arange(3),
+    index = ["b", "e", "f"],
+)
+series_2
+
+frame + series_2
+```
+
+If you want to *broadcast* an operation across columns instead of down the rows, you can do so with the `axis` keyword within the corresponding arithmetic method:
+
+```{python}
+series_3 = frame["d"]
+
+frame
+
+series_3
+
+frame.sub(series_3, axis = "index")
+```
+
+One thing to reckognize here is that the the axis you pass is the axis the one to *match* the labels on, instead of the direction of the *broadcast* operation. So in the case above, to have the operation across the columns we told the function to *match* by `index`.
+
+## Function Application and Mapping
+
+NumPy ufuncs (element-wise array methods) also apply to pandas objects:
+
+```{python}
+frame = pd.DataFrame(
+    np.random.standard_normal((4, 3)),
+    columns = list("bde"),
+    index = ["Lasagna", "Alfried", "Ragna", "Bernd"]
+)
+frame
+
+np.abs(frame)
+```
+
+Functions that usually apply for one-dimensional arrays can be along the DataFrames' axes with the `apply` method:
+
+
+```{python}
+def f_1(x):
+    return x.max() - x.min()
+
+frame.apply(f_1)
+```
+
+By default the function is applied to all the elements of each column. You can choose the direction with the `axis` keyword. So to regard the elements of each row *across* all columns you'd write:
+
+```{python}
+frame.apply(f_1, axis = "columns")
+```
+
+The most common array statistics (like `sum` or `mean`) exist already as DataFrame methods, so you can spare the `apply`.
+
+You can even expand the function to be `apply`'d from returning scalar values to Series with multiple result elemets:
+
+```{python}
+def f_2(x):
+    return pd.Series([x.min(), x.max(), x.mean()],
+    index = ["min", "max", "mean"],
+    )
+
+frame.apply(f_2)
+```
+
+
+```{python}
+def my_format(x):
+    return f"{x:.2f}"
+
+frame.map(my_format)
+```
+
+
+::: {.callout-caution}
+
+`applymap` has been deprecated in favor of `map` as the method call.
+
+:::

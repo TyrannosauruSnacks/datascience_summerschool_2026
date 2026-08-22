@@ -1,6 +1,6 @@
 # Getting Started with pandas
 Max Arthur Hachemeister
-2026-08-19
+2026-08-22
 
 - [Prerequisites](#prerequisites)
 - [5.1 Introduction to pandas Data
@@ -16,6 +16,12 @@ Max Arthur Hachemeister
     - [Selection on DataFrame with Loc and
       Iloc](#selection-on-dataframe-with-loc-and-iloc)
   - [Arithmetic and Data Alignment](#arithmetic-and-data-alignment)
+    - [Arithmetic Methods with Fill
+      Values](#arithmetic-methods-with-fill-values)
+    - [Operations Between DataFrame and
+      Series](#operations-between-dataframe-and-series)
+  - [Function Application and
+    Mapping](#function-application-and-mapping)
 
 # Prerequisites
 
@@ -2376,7 +2382,7 @@ values given as it does not refer to the original object anymore:
 data.loc[data.three == 5]["three"] = 6
 ```
 
-    /tmp/ipykernel_57860/2163647394.py:2: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment.
+    /tmp/ipykernel_108427/2163647394.py:2: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment.
     Such chained assignment never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).
 
     Try using '.loc[row_indexer, col_indexer] = value' instead, to perform the assignment in a single step.
@@ -2416,3 +2422,777 @@ data
 </div>
 
 ## Arithmetic and Data Alignment
+
+A nice data science feature of pandas it the way it treats objects with
+different indexes. When adding two objects, for example, the resulting
+object is the union of the index pairs, meaning you are not ommitting
+any datapoints in the process. Check it out:
+
+``` python
+s_1 = pd.Series(
+    [7.3, -2.5, 3.4, 1.5],
+    index = ["a", "c", "d", "e"],
+)
+s_2 = pd.Series(
+    [-2.1, 3.6, -1.5, 4, 3.1,],
+    index = ["a", "c", "e", "f", "g"]
+)
+
+s_1
+s_2
+```
+
+    a    7.3
+    c   -2.5
+    d    3.4
+    e    1.5
+    dtype: float64
+
+    a   -2.1
+    c    3.6
+    e   -1.5
+    f    4.0
+    g    3.1
+    dtype: float64
+
+Now, addition with those two gives you:
+
+``` python
+s_1 + s_2
+```
+
+    a    5.2
+    c    1.1
+    d    NaN
+    e    0.0
+    f    NaN
+    g    NaN
+    dtype: float64
+
+Where indexes do not overlap, `NaN`s are introduced and persist for
+future operations.
+
+Furthemore, DataFrame does the same alignment for both rows and columns:
+
+``` python
+df_1 = pd.DataFrame(
+    np.arange(9.).reshape((3, 3)),
+    columns = list("bcd"),
+    index = ["Ohio", "Texas", "Colorado"],
+)
+
+df_2 = pd.DataFrame(
+    np.arange(12.).reshape((4, 3)),
+    columns = list("bde"),
+    index = ["Utah", "Ohio", "Texas", "Oregon"]
+)
+
+df_1
+df_2
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | b   | c   | d   |
+|----------|-----|-----|-----|
+| Ohio     | 0.0 | 1.0 | 2.0 |
+| Texas    | 3.0 | 4.0 | 5.0 |
+| Colorado | 6.0 | 7.0 | 8.0 |
+
+</div>
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|        | b   | d    | e    |
+|--------|-----|------|------|
+| Utah   | 0.0 | 1.0  | 2.0  |
+| Ohio   | 3.0 | 4.0  | 5.0  |
+| Texas  | 6.0 | 7.0  | 8.0  |
+| Oregon | 9.0 | 10.0 | 11.0 |
+
+</div>
+
+Adding these yields the unions of both DataFrames’ rows and columns:
+
+``` python
+df_1 + df_2
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|          | b   | c   | d    | e   |
+|----------|-----|-----|------|-----|
+| Colorado | NaN | NaN | NaN  | NaN |
+| Ohio     | 3.0 | NaN | 6.0  | NaN |
+| Oregon   | NaN | NaN | NaN  | NaN |
+| Texas    | 9.0 | NaN | 12.0 | NaN |
+| Utah     | NaN | NaN | NaN  | NaN |
+
+</div>
+
+And, with no common index values between DataFrames, you will get all
+`NaN`s:
+
+``` python
+df_1 = pd.DataFrame({"A": [1, 2]})
+
+df_2 = pd.DataFrame({"B": [3, 4]})
+
+df_1
+
+df_2
+
+df_1 + df_2
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|     | A   |
+|-----|-----|
+| 0   | 1   |
+| 1   | 2   |
+
+</div>
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|     | B   |
+|-----|-----|
+| 0   | 3   |
+| 1   | 4   |
+
+</div>
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|     | A   | B   |
+|-----|-----|-----|
+| 0   | NaN | NaN |
+| 1   | NaN | NaN |
+
+</div>
+
+### Arithmetic Methods with Fill Values
+
+You can change the above default value for solitary data points with the
+`fill_value` argument. And while we’re at it, this will also use the
+`nan` method:
+
+``` python
+df_1 = pd.DataFrame(
+    np.arange(12.).reshape((3, 4)),
+    columns = list("abcd")
+)
+
+df_2 = pd.DataFrame(
+    np.arange(20.).reshape((4,5)),
+    columns = list("abcde")
+)
+
+# Assing the value `NaN` to the second row of column `b`.
+df_2.loc[1, "b"] = np.nan
+
+df_2
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|     | a    | b    | c    | d    | e    |
+|-----|------|------|------|------|------|
+| 0   | 0.0  | 1.0  | 2.0  | 3.0  | 4.0  |
+| 1   | 5.0  | NaN  | 7.0  | 8.0  | 9.0  |
+| 2   | 10.0 | 11.0 | 12.0 | 13.0 | 14.0 |
+| 3   | 15.0 | 16.0 | 17.0 | 18.0 | 19.0 |
+
+</div>
+
+Now some addition to introduce more `NaN`s:
+
+``` python
+df_1 + df_2
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|     | a    | b    | c    | d    | e   |
+|-----|------|------|------|------|-----|
+| 0   | 0.0  | 2.0  | 4.0  | 6.0  | NaN |
+| 1   | 9.0  | NaN  | 13.0 | 15.0 | NaN |
+| 2   | 18.0 | 20.0 | 22.0 | 24.0 | NaN |
+| 3   | NaN  | NaN  | NaN  | NaN  | NaN |
+
+</div>
+
+With `+` being an operator lacking any arguments, we need to use the
+alternative `add` method for setting another `fill_value`:
+
+``` python
+df_1.add(df_2, fill_value = 0)
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|     | a    | b    | c    | d    | e    |
+|-----|------|------|------|------|------|
+| 0   | 0.0  | 2.0  | 4.0  | 6.0  | 4.0  |
+| 1   | 9.0  | 5.0  | 13.0 | 15.0 | 9.0  |
+| 2   | 18.0 | 20.0 | 22.0 | 24.0 | 14.0 |
+| 3   | 15.0 | 16.0 | 17.0 | 18.0 | 19.0 |
+
+</div>
+
+Notice how the values are filled first and are passed to the arithmetic
+operation. Because we set `0` in the above example, solitary datapoints
+make it “unaltered” into the new DataFrame.
+
+There are a bunch of Series and DataFrame methods available for
+arithmetic operations. Check either the table in the book or the
+documentation. One thing to note right away is that all of these methods
+has an version where the arguments are reversed. So the following are
+equivalent:
+
+``` python
+1 / df_1
+
+df_1.rdiv(1)
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|     | a     | b        | c        | d        |
+|-----|-------|----------|----------|----------|
+| 0   | inf   | 1.000000 | 0.500000 | 0.333333 |
+| 1   | 0.250 | 0.200000 | 0.166667 | 0.142857 |
+| 2   | 0.125 | 0.111111 | 0.100000 | 0.090909 |
+
+</div>
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|     | a     | b        | c        | d        |
+|-----|-------|----------|----------|----------|
+| 0   | inf   | 1.000000 | 0.500000 | 0.333333 |
+| 1   | 0.250 | 0.200000 | 0.166667 | 0.142857 |
+| 2   | 0.125 | 0.111111 | 0.100000 | 0.090909 |
+
+</div>
+
+Which is probably nice for consitently using methods only for
+arithmetic.
+
+On another note, you can also supply a different fill value for
+reindexing:
+
+``` python
+df_1.reindex(columns = df_2.columns, fill_value = 0)
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|     | a   | b   | c    | d    | e   |
+|-----|-----|-----|------|------|-----|
+| 0   | 0.0 | 1.0 | 2.0  | 3.0  | 0   |
+| 1   | 4.0 | 5.0 | 6.0  | 7.0  | 0   |
+| 2   | 8.0 | 9.0 | 10.0 | 11.0 | 0   |
+
+</div>
+
+### Operations Between DataFrame and Series
+
+The behavior for arithmatic between DataFrame is also defined for
+sensible and convenient returns. Let’s start with an example to see how
+an Array behaves. We will apply a single row (Series) of this Array to
+itself:
+
+``` python
+arr = np.arange(12.).reshape((3, 4))
+arr
+
+arr[0]
+
+arr - arr[0]
+```
+
+    array([[ 0.,  1.,  2.,  3.],
+           [ 4.,  5.,  6.,  7.],
+           [ 8.,  9., 10., 11.]])
+
+    array([0., 1., 2., 3.])
+
+    array([[0., 0., 0., 0.],
+           [4., 4., 4., 4.],
+           [8., 8., 8., 8.]])
+
+So the subtraction of the row values is applied down each row of the
+array. In NumPy this is referred to as *broadcasting*.
+
+pandas objects behave similarly, but additionally regard the alignment
+of the indexes. Let’s first create some objects:
+
+``` python
+frame = pd.DataFrame(
+    np.arange(12.).reshape((4, 3)),
+    columns = list("bde"),
+    index = ["Utah", "Ohio", "Texas", "Oregon"],
+)
+
+# Remember to prefer `loc` and `iloc` for indexing DataFrames
+series = frame.iloc[0]
+
+frame
+series
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|        | b   | d    | e    |
+|--------|-----|------|------|
+| Utah   | 0.0 | 1.0  | 2.0  |
+| Ohio   | 3.0 | 4.0  | 5.0  |
+| Texas  | 6.0 | 7.0  | 8.0  |
+| Oregon | 9.0 | 10.0 | 11.0 |
+
+</div>
+
+    b    0.0
+    d    1.0
+    e    2.0
+    Name: Utah, dtype: float64
+
+The default for arithmetic between pandas objects is to aling the
+columns and then *broadcast* down the rows:
+
+``` python
+frame - series
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|        | b   | d   | e   |
+|--------|-----|-----|-----|
+| Utah   | 0.0 | 0.0 | 0.0 |
+| Ohio   | 3.0 | 3.0 | 3.0 |
+| Texas  | 6.0 | 6.0 | 6.0 |
+| Oregon | 9.0 | 9.0 | 9.0 |
+
+</div>
+
+As before, solitary DataFrame columns or Series indexes will persist as
+`NaN`s in the returned DataFrame:
+
+``` python
+series_2 = pd.Series(
+    np.arange(3),
+    index = ["b", "e", "f"],
+)
+series_2
+
+frame + series_2
+```
+
+    b    0
+    e    1
+    f    2
+    dtype: int64
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|        | b   | d   | e    | f   |
+|--------|-----|-----|------|-----|
+| Utah   | 0.0 | NaN | 3.0  | NaN |
+| Ohio   | 3.0 | NaN | 6.0  | NaN |
+| Texas  | 6.0 | NaN | 9.0  | NaN |
+| Oregon | 9.0 | NaN | 12.0 | NaN |
+
+</div>
+
+If you want to *broadcast* an operation across columns instead of down
+the rows, you can do so with the `axis` keyword within the corresponding
+arithmetic method:
+
+``` python
+series_3 = frame["d"]
+
+frame
+
+series_3
+
+frame.sub(series_3, axis = "index")
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|        | b   | d    | e    |
+|--------|-----|------|------|
+| Utah   | 0.0 | 1.0  | 2.0  |
+| Ohio   | 3.0 | 4.0  | 5.0  |
+| Texas  | 6.0 | 7.0  | 8.0  |
+| Oregon | 9.0 | 10.0 | 11.0 |
+
+</div>
+
+    Utah       1.0
+    Ohio       4.0
+    Texas      7.0
+    Oregon    10.0
+    Name: d, dtype: float64
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|        | b    | d   | e   |
+|--------|------|-----|-----|
+| Utah   | -1.0 | 0.0 | 1.0 |
+| Ohio   | -1.0 | 0.0 | 1.0 |
+| Texas  | -1.0 | 0.0 | 1.0 |
+| Oregon | -1.0 | 0.0 | 1.0 |
+
+</div>
+
+One thing to reckognize here is that the the axis you pass is the axis
+the one to *match* the labels on, instead of the direction of the
+*broadcast* operation. So in the case above, to have the operation
+across the columns we told the function to *match* by `index`.
+
+## Function Application and Mapping
+
+NumPy ufuncs (element-wise array methods) also apply to pandas objects:
+
+``` python
+frame = pd.DataFrame(
+    np.random.standard_normal((4, 3)),
+    columns = list("bde"),
+    index = ["Lasagna", "Alfried", "Ragna", "Bernd"]
+)
+frame
+
+np.abs(frame)
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|         | b        | d         | e         |
+|---------|----------|-----------|-----------|
+| Lasagna | 0.556807 | 1.526192  | -0.903839 |
+| Alfried | 0.844629 | 1.081309  | 1.145509  |
+| Ragna   | 0.155995 | -0.461579 | 2.211251  |
+| Bernd   | 1.056986 | 0.290661  | 0.059647  |
+
+</div>
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|         | b        | d        | e        |
+|---------|----------|----------|----------|
+| Lasagna | 0.556807 | 1.526192 | 0.903839 |
+| Alfried | 0.844629 | 1.081309 | 1.145509 |
+| Ragna   | 0.155995 | 0.461579 | 2.211251 |
+| Bernd   | 1.056986 | 0.290661 | 0.059647 |
+
+</div>
+
+Functions that usually apply for one-dimensional arrays can be along the
+DataFrames’ axes with the `apply` method:
+
+``` python
+def f_1(x):
+    return x.max() - x.min()
+
+frame.apply(f_1)
+```
+
+    b    0.900991
+    d    1.987770
+    e    3.115090
+    dtype: float64
+
+By default the function is applied to all the elements of each column.
+You can choose the direction with the `axis` keyword. So to regard the
+elements of each row *across* all columns you’d write:
+
+``` python
+frame.apply(f_1, axis = "columns")
+```
+
+    Lasagna    2.430031
+    Alfried    0.300880
+    Ragna      2.672829
+    Bernd      0.997339
+    dtype: float64
+
+The most common array statistics (like `sum` or `mean`) exist already as
+DataFrame methods, so you can spare the `apply`.
+
+You can even expand the function to be `apply`’d from returning scalar
+values to Series with multiple result elemets:
+
+``` python
+def f_2(x):
+    return pd.Series([x.min(), x.max(), x.mean()],
+    index = ["min", "max", "mean"],
+    )
+
+frame.apply(f_2)
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|      | b        | d         | e         |
+|------|----------|-----------|-----------|
+| min  | 0.155995 | -0.461579 | -0.903839 |
+| max  | 1.056986 | 1.526192  | 2.211251  |
+| mean | 0.653604 | 0.609146  | 0.628142  |
+
+</div>
+
+``` python
+def my_format(x):
+    return f"{x:.2f}"
+
+frame.map(my_format)
+```
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|         | b    | d     | e     |
+|---------|------|-------|-------|
+| Lasagna | 0.56 | 1.53  | -0.90 |
+| Alfried | 0.84 | 1.08  | 1.15  |
+| Ragna   | 0.16 | -0.46 | 2.21  |
+| Bernd   | 1.06 | 0.29  | 0.06  |
+
+</div>
+
+> [!CAUTION]
+>
+> `applymap` has been deprecated in favor of `map` as the method call.
